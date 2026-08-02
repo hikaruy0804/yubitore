@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Hand = "left" | "right" | "thumb";
 type Finger = "pinky" | "ring" | "middle" | "index" | "thumb";
-type Screen = "home" | "scenes" | "practice" | "result";
+type Screen = "scenes" | "practice" | "result";
 type SceneId =
   | "mail"
   | "meeting"
@@ -504,7 +504,7 @@ function sortedMistakes(mistakes: Record<string, number>) {
 
 function Brand({ onClick }: { onClick: () => void }) {
   return (
-    <button className="brand" onClick={onClick} aria-label="ゆびトレのトップへ">
+    <button className="brand" onClick={onClick} aria-label="練習メニューへ">
       <span>ゆびトレ</span>
       <small>文章やコードを打ちながら、指だけ整える</small>
     </button>
@@ -674,7 +674,7 @@ function SettingsPanel({
 }
 
 export default function Home() {
-  const [screen, setScreen] = useState<Screen>("home");
+  const [screen, setScreen] = useState<Screen>("scenes");
   const [scene, setScene] = useState<SceneId>("mail");
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [history, setHistory] = useState<SessionRecord[]>([]);
@@ -882,9 +882,9 @@ export default function Home() {
     setScreen("practice");
   };
 
-  const goHome = () => {
+  const goToScenes = () => {
     setPaused(false);
-    setScreen("home");
+    setScreen("scenes");
   };
 
   const style = { "--font-scale": settings.fontScale } as React.CSSProperties;
@@ -899,29 +899,15 @@ export default function Home() {
       </div>
 
       <header className="site-header">
-        <Brand onClick={goHome} />
+        <Brand onClick={goToScenes} />
         <nav aria-label="メインメニュー">
           <button onClick={() => setHistoryOpen(true)}>練習履歴</button>
           <button onClick={() => setSettingsOpen(true)}>設定</button>
         </nav>
       </header>
 
-      {screen === "home" && (
-        <div className="page-shell">
-          <section className="hero" aria-label="練習を開始">
-            <div className="home-start">
-              <button className="primary-button hero-button" onClick={() => setScreen("scenes")}>
-                練習を始める <span>→</span>
-              </button>
-              <small className="hero-safety">痛みやしびれがある場合は、手を休めてください。</small>
-            </div>
-          </section>
-        </div>
-      )}
-
       {screen === "scenes" && (
         <div className="page-shell inner-page">
-          <button className="back-link" onClick={goHome}>← トップへ戻る</button>
           <div className="page-title">
             <p className="eyebrow">練習メニュー</p>
             <h1>練習を選ぶ</h1>
@@ -1123,7 +1109,7 @@ export default function Home() {
                 <p>入力位置はそのまま保存されています。</p>
                 <button className="primary-button" onClick={() => setPaused(false)}>入力を再開</button>
                 <button className="secondary-button" onClick={startPractice}>最初からやり直す</button>
-                <button className="text-button" onClick={goHome}>練習を終了</button>
+                <button className="text-button" onClick={goToScenes}>練習を終了</button>
               </section>
             </div>
           )}
@@ -1182,7 +1168,7 @@ export default function Home() {
           <div className="result-actions">
             <button className="primary-button" onClick={startPractice}>{isJavaScene(scene) ? "同じ構文をもう一度" : "同じ文章をもう一度"}</button>
             <button className="secondary-button" onClick={() => setScreen("scenes")}>別の練習を選ぶ</button>
-            <button className="text-button" onClick={goHome}>トップへ戻る</button>
+            <button className="text-button" onClick={goToScenes}>練習メニューへ</button>
           </div>
           <aside className="safety-note">手をキーボードから離し、指と肩を休ませましょう。</aside>
         </div>
