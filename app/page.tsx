@@ -128,31 +128,73 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       id: "mail-1",
       context: "資料を受け取ったあとの確認メール",
       description: "お世話になっております。資料を確認しました。",
-      input: "osewa ni natte orimasu. shiryou o kakunin shimashita.",
+      input: "osewaninatteorimasu.shiryouwokakuninshimashita.",
     },
     {
       id: "mail-2",
       context: "日程を調整するときの依頼メール",
       description: "ご都合のよい時間をお知らせください。",
-      input: "gotsugou no yoi jikan o oshirase kudasai.",
+      input: "gotsugounoyoijikanwooshirasekudasai.",
     },
     {
       id: "mail-3",
       context: "対応へのお礼を伝えるメール",
       description: "早速のご対応、ありがとうございます。",
-      input: "sassoku no gotaiou, arigatou gozaimasu.",
+      input: "sassokunogotaiou,arigatougozaimasu.",
     },
     {
       id: "mail-4",
       context: "返信が遅れたときのおわび",
       description: "ご返信が遅くなり、申し訳ございません。",
-      input: "gohenshin ga osoku nari, moushiwake gozaimasen.",
+      input: "gohenshingaosokunari,moushiwakegozaimasenn.",
     },
     {
       id: "mail-5",
       context: "確認をお願いする結びのメール",
       description: "お手数ですが、ご確認のほどよろしくお願いします。",
-      input: "otesuu desu ga, gokakunin no hodo yoroshiku onegai shimasu.",
+      input: "otesuudesuga,gokakuninnohodoyoroshikuonegaishimasu.",
+    },
+    {
+      id: "mail-6",
+      context: "資料を添付したときの案内",
+      description: "会議資料を添付しましたので、ご確認ください。",
+      input: "kaigishiryouwotenpushimashitanode,gokakuninkudasai.",
+    },
+    {
+      id: "mail-7",
+      context: "質問を受け付ける結び",
+      description: "ご不明な点がございましたら、お知らせください。",
+      input: "gofumeinatengagozaimashitara,oshirasekudasai.",
+    },
+    {
+      id: "mail-8",
+      context: "回答期限を伝えるメール",
+      description: "本件について、明日までに回答いたします。",
+      input: "honkennitsuite,ashitamadenikaitouitashimasu.",
+    },
+    {
+      id: "mail-9",
+      context: "見積書を再送するメール",
+      description: "念のため、見積書を再送いたします。",
+      input: "nennotame,mitsumorishowosaisouitashimasu.",
+    },
+    {
+      id: "mail-10",
+      context: "承認期限を伝える依頼",
+      description: "明日の正午までに、承認をお願いします。",
+      input: "ashitanoshougomadeni,shouninwoonegaishimasu.",
+    },
+    {
+      id: "mail-11",
+      context: "日程候補を送るメール",
+      description: "日程の候補を三つお送りしました。",
+      input: "nitteinokouhowomittsuookurishimashita.",
+    },
+    {
+      id: "mail-12",
+      context: "質問へ回答するメール",
+      description: "ご質問への回答を本文に記載しました。",
+      input: "goshitsumonhenokaitouwohonbunnikisaishimashita.",
     },
   ],
   meeting: [
@@ -160,31 +202,73 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       id: "meeting-1",
       context: "次回会議の予定",
       description: "次回の会議は火曜日の午後二時からです。",
-      input: "jikai no kaigi wa kayoubi no gogo niji kara desu.",
+      input: "jikainokaigihakayoubinogogonijikaradesu.",
     },
     {
       id: "meeting-2",
       context: "会議で決まったこと",
       description: "新しい案を金曜日までに確認します。",
-      input: "atarashii an o kinyoubi made ni kakunin shimasu.",
+      input: "atarashiianwokinyoubimadenikakuninshimasu.",
     },
     {
       id: "meeting-3",
       context: "担当と次の行動",
       description: "担当者が内容を整理して共有します。",
-      input: "tantousha ga naiyou o seiri shite kyouyuu shimasu.",
+      input: "tantoushaganaiyouwoseirishitekyouyuushimasu.",
     },
     {
       id: "meeting-4",
       context: "議題の確認",
       description: "本日の議題は、計画と予算の確認です。",
-      input: "honjitsu no gidai wa, keikaku to yosan no kakunin desu.",
+      input: "honjitsunogidaiha,keikakutoyosannokakunindesu.",
     },
     {
       id: "meeting-5",
       context: "保留事項の記録",
       description: "判断に必要な情報を集め、次回に持ち越します。",
-      input: "handan ni hitsuyou na jouhou o atsume, jikai ni mochikoshimasu.",
+      input: "handannihitsuyounajouhouwoatsume,jikainimochikoshimasu.",
+    },
+    {
+      id: "meeting-6",
+      context: "次回までの宿題",
+      description: "次回までに担当ごとの課題を整理します。",
+      input: "jikaimadenitantougotonokadaiwoseirishimasu.",
+    },
+    {
+      id: "meeting-7",
+      context: "予算案の再確認",
+      description: "予算案は修正後に再度確認します。",
+      input: "yosannanhashuuseigonisaidokakuninshimasu.",
+    },
+    {
+      id: "meeting-8",
+      context: "議事録の共有",
+      description: "議事録は本日中に参加者へ共有します。",
+      input: "gijirokuhahonjitsuchuunisankashahekyouyuushimasu.",
+    },
+    {
+      id: "meeting-9",
+      context: "優先順位の決定",
+      description: "参加者の意見を踏まえ、優先順位を決めます。",
+      input: "sankashanoikenwofumae,yuusenjunniwokimemasu.",
+    },
+    {
+      id: "meeting-10",
+      context: "未決定項目の確認",
+      description: "未決定の項目は、担当部署へ確認します。",
+      input: "miketteinokoumokuha,tantoubushohekakuninshimasu.",
+    },
+    {
+      id: "meeting-11",
+      context: "会議室の場所を共有",
+      description: "次の会議室は三階の東側です。",
+      input: "tsuginokaigishitsuha,sangainohigashigawadesu.",
+    },
+    {
+      id: "meeting-12",
+      context: "期限延長の合意",
+      description: "期限を一週間延長することで合意しました。",
+      input: "kigenwoisshuukannenchousurukotodegouishimashita.",
     },
   ],
   chat: [
@@ -192,31 +276,73 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       id: "chat-1",
       context: "確認依頼への返信",
       description: "承知しました。内容を確認して折り返します。",
-      input: "shouchi shimashita. naiyou o kakunin shite orikaeshimasu.",
+      input: "shouchishimashita.naiyouwokakuninshiteorikaeshimasu.",
     },
     {
       id: "chat-2",
       context: "作業完了の連絡",
       description: "更新が完了しました。ご確認をお願いします。",
-      input: "koushin ga kanryou shimashita. gokakunin o onegai shimasu.",
+      input: "koushingakanryoushimashita.gokakuninwoonegaishimasu.",
     },
     {
       id: "chat-3",
       context: "少し待ってもらう返信",
       description: "確認しますので、少々お待ちください。",
-      input: "kakunin shimasu node, shoushou omachi kudasai.",
+      input: "kakuninshimasunode,shoushouomachikudasai.",
     },
     {
       id: "chat-4",
       context: "相談を始めるメッセージ",
       description: "少しご相談したいことがあります。",
-      input: "sukoshi gosoudan shitai koto ga arimasu.",
+      input: "sukoshigosoudanshitaikotogaarimasu.",
     },
     {
       id: "chat-5",
       context: "共有への短い返信",
       description: "共有ありがとうございます。とても助かります。",
-      input: "kyouyuu arigatou gozaimasu. totemo tasukarimasu.",
+      input: "kyouyuuarigatougozaimasu.totemotasukarimasu.",
+    },
+    {
+      id: "chat-6",
+      context: "対応開始の連絡",
+      description: "今から対応を始めます。",
+      input: "imakarataiouwohajimemasu.",
+    },
+    {
+      id: "chat-7",
+      context: "確認結果の返信",
+      description: "内容を確認しました。問題ありません。",
+      input: "naiyouwokakuninshimashita.mondaiarimasenn.",
+    },
+    {
+      id: "chat-8",
+      context: "当日作業の完了報告",
+      description: "本日の対応は完了しました。",
+      input: "honjitsunotaiouhakanryoushimashita.",
+    },
+    {
+      id: "chat-9",
+      context: "引き継ぎの連絡",
+      description: "了解です。こちらで引き継ぎます。",
+      input: "ryoukaidesu.kochiradehikitsugimasu.",
+    },
+    {
+      id: "chat-10",
+      context: "急ぎでないことを伝える返信",
+      description: "急ぎではないので、明日で大丈夫です。",
+      input: "isogidehanainode,ashitadedaijoubudesu.",
+    },
+    {
+      id: "chat-11",
+      context: "確認後の連絡を約束",
+      description: "対応方法を確認でき次第、連絡します。",
+      input: "taiouhouhouwokakunindekishidai,renrakushimasu.",
+    },
+    {
+      id: "chat-12",
+      context: "ファイルを再送する連絡",
+      description: "ファイル名を変更して再度送ります。",
+      input: "fairumeiwohenkoushitesaidookurimasu.",
     },
   ],
   document: [
@@ -224,31 +350,73 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       id: "document-1",
       context: "提案書の導入",
       description: "新しい提案について、要点を三つに整理します。",
-      input: "atarashii teian ni tsuite, youten o mittsu ni seiri shimasu.",
+      input: "atarashiiteiannitsuite,youtenwomittsuniseirishimasu.",
     },
     {
       id: "document-2",
       context: "状況報告の本文",
       description: "現在の進捗と今後の予定を共有します。",
-      input: "genzai no shinchoku to kongo no yotei o kyouyuu shimasu.",
+      input: "genzainoshinchokutokongonoyoteiwokyouyuushimasu.",
     },
     {
       id: "document-3",
       context: "手順書の説明",
       description: "はじめに設定画面を開き、必要な項目を選びます。",
-      input: "hajime ni settei gamen o hiraki, hitsuyou na koumoku o erabimasu.",
+      input: "hajimenisetteigamenwohiraki,hitsuyounakoumokuwoerabimasu.",
     },
     {
       id: "document-4",
       context: "改善案のまとめ",
       description: "課題を整理し、実行しやすい改善策を提案します。",
-      input: "kadai o seiri shi, jikkou shiyasui kaizensaku o teian shimasu.",
+      input: "kadaiwoseirishi,jikkoushiyasuikaizensakuwoteianshimasu.",
     },
     {
       id: "document-5",
       context: "報告書の結論",
       description: "以上の結果から、次の方針を決定しました。",
-      input: "ijou no kekka kara, tsugi no houshin o kettei shimashita.",
+      input: "ijounokekkakara,tsuginohoushinwoketteishimashita.",
+    },
+    {
+      id: "document-6",
+      context: "調査結果の説明",
+      description: "調査結果を表にまとめ、傾向を説明します。",
+      input: "chousakekkawohyounimatome,keikouwosetsumeishimasu.",
+    },
+    {
+      id: "document-7",
+      context: "実施条件の明記",
+      description: "対象範囲と実施期間を明確にします。",
+      input: "taishouhannitojisshikikanwomeikakunishimasu.",
+    },
+    {
+      id: "document-8",
+      context: "手順書への反映",
+      description: "変更点を確認し、手順書へ反映します。",
+      input: "henkoutenwokakuninshi,tejunshohehanneishimasu.",
+    },
+    {
+      id: "document-9",
+      context: "目的と背景の整理",
+      description: "目的と背景を分けて、簡潔に記述します。",
+      input: "mokutekitohaikeiwowakete,kanketsunikijutsushimasu.",
+    },
+    {
+      id: "document-10",
+      context: "書式の統一",
+      description: "各項目の番号と見出しを統一します。",
+      input: "kakukoumokunobangoutomidashiwotouitsushimasu.",
+    },
+    {
+      id: "document-11",
+      context: "具体例の追加",
+      description: "読み手が迷わないよう、具体例を追加します。",
+      input: "yomitegamayowanaiyou,gutaireiwotsuikashimasu.",
+    },
+    {
+      id: "document-12",
+      context: "最終版の配布",
+      description: "最終版を保存し、関係者へ配布します。",
+      input: "saishuubanwohozonshi,kankeishahehaifushimasu.",
     },
   ],
   hello: [
@@ -282,6 +450,24 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       description: "計算式をprintlnの引数へ直接記述します。",
       input: 'public class Calculator {\n    public static void main(String[] args) {\n        System.out.println(12 + 8);\n    }\n}',
     },
+    {
+      id: "hello-6",
+      context: "変数を含むあいさつ",
+      description: "文字列変数を標準出力へ連結します。",
+      input: 'public class Welcome {\n    public static void main(String[] args) {\n        String name = "Aki";\n        System.out.println("Welcome, " + name);\n    }\n}',
+    },
+    {
+      id: "hello-7",
+      context: "真偽値の標準出力",
+      description: "boolean値をprintlnで表示します。",
+      input: "public class Status {\n    public static void main(String[] args) {\n        System.out.println(true);\n    }\n}",
+    },
+    {
+      id: "hello-8",
+      context: "複数の計算を表示",
+      description: "掛け算と足し算を含む式を出力します。",
+      input: "public class Formula {\n    public static void main(String[] args) {\n        System.out.println(4 * 5 + 2);\n    }\n}",
+    },
   ],
   variables: [
     {
@@ -313,6 +499,24 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       context: "配列の初期化",
       description: "角括弧と波括弧を含む配列宣言です。",
       input: "int[] scores = {78, 85, 92};\nint first = scores[0];",
+    },
+    {
+      id: "variables-6",
+      context: "long型とfloat型",
+      description: "整数と小数の別の型を宣言します。",
+      input: "long distance = 1200;\nfloat rate = 1.5f;",
+    },
+    {
+      id: "variables-7",
+      context: "文字列変数の連結",
+      description: "複数の文字列変数を一つにまとめます。",
+      input: 'String firstName = "Aki";\nString lastName = "Sato";\nString fullName = firstName + lastName;',
+    },
+    {
+      id: "variables-8",
+      context: "変数の再代入",
+      description: "値のコピーと再代入を続けて入力します。",
+      input: "int x = 10;\nint y = x;\nx = 20;",
     },
   ],
   condition: [
@@ -346,6 +550,24 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       description: "else ifを使って条件を順番に評価します。",
       input: 'if (score >= 90) {\n    grade = "A";\n} else if (score >= 80) {\n    grade = "B";\n} else {\n    grade = "C";\n}',
     },
+    {
+      id: "condition-6",
+      context: "文字列の一致判定",
+      description: "equalsメソッドを条件式で使用します。",
+      input: 'if (name.equals("Aki")) {\n    System.out.println("Hello");\n}',
+    },
+    {
+      id: "condition-7",
+      context: "三項演算子",
+      description: "条件に応じて文字列を選択します。",
+      input: 'String result = score >= 60 ? "Pass" : "Fail";',
+    },
+    {
+      id: "condition-8",
+      context: "入れ子の条件分岐",
+      description: "if文の中でもう一つの条件を確認します。",
+      input: 'if (loggedIn) {\n    if (admin) {\n        System.out.println("Admin");\n    }\n}',
+    },
   ],
   loop: [
     {
@@ -378,6 +600,24 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       description: "入れ子になったfor文と掛け算を練習します。",
       input: "for (int row = 1; row <= 3; row++) {\n    for (int col = 1; col <= 3; col++) {\n        System.out.println(row * col);\n    }\n}",
     },
+    {
+      id: "loop-6",
+      context: "do-whileループ",
+      description: "処理後に条件を判定するループです。",
+      input: "int count = 3;\ndo {\n    count--;\n} while (count > 0);",
+    },
+    {
+      id: "loop-7",
+      context: "continueによるスキップ",
+      description: "条件に合う回だけ処理を飛ばします。",
+      input: "for (int i = 0; i < 6; i++) {\n    if (i % 2 == 0) {\n        continue;\n    }\n    System.out.println(i);\n}",
+    },
+    {
+      id: "loop-8",
+      context: "breakによる終了",
+      description: "条件に達した時点でループを終了します。",
+      input: "for (int i = 0; i < 10; i++) {\n    if (i == 4) {\n        break;\n    }\n}",
+    },
   ],
   method: [
     {
@@ -409,6 +649,24 @@ const EXERCISES: Record<SceneId, Exercise[]> = {
       context: "文字列を返すメソッド",
       description: "String型の戻り値と文字列連結を練習します。",
       input: 'static String label(String name) {\n    return "Hello, " + name;\n}',
+    },
+    {
+      id: "method-6",
+      context: "引数なしのメソッド",
+      description: "引数を持たないvoidメソッドを定義します。",
+      input: 'static void showTitle() {\n    System.out.println("Menu");\n}',
+    },
+    {
+      id: "method-7",
+      context: "配列を受け取るメソッド",
+      description: "配列の先頭要素を戻り値にします。",
+      input: "static int first(int[] values) {\n    return values[0];\n}",
+    },
+    {
+      id: "method-8",
+      context: "メソッド呼び出しの入れ子",
+      description: "戻り値を別のメソッド呼び出しへ渡します。",
+      input: "int total = add(add(1, 2), 3);\nSystem.out.println(total);",
     },
   ],
 };
@@ -596,12 +854,24 @@ function KeyboardMap({
   );
 }
 
+function exerciseCountLabel(count: number, max: number) {
+  if (count === max) return "全問";
+  if (count === 1) return "短め";
+  if (count === 2) return "軽め";
+  if (count <= 4) return "標準";
+  if (count <= 6) return "しっかり";
+  if (count <= 9) return "多め";
+  return "たっぷり";
+}
+
 function SettingsPanel({
   settings,
+  maxExerciseCount,
   onChange,
   onClose,
 }: {
   settings: Settings;
+  maxExerciseCount: number;
   onChange: (settings: Settings) => void;
   onClose: () => void;
 }) {
@@ -618,14 +888,12 @@ function SettingsPanel({
         <label>
           1回の課題数
           <select
-            value={settings.exerciseCount}
+            value={Math.min(settings.exerciseCount, maxExerciseCount)}
             onChange={(event) => onChange({ ...settings, exerciseCount: Number(event.target.value) })}
           >
-            <option value={1}>1題・短め</option>
-            <option value={2}>2題・軽め</option>
-            <option value={3}>3題・標準</option>
-            <option value={4}>4題・しっかり</option>
-            <option value={5}>5題・全問</option>
+            {Array.from({ length: maxExerciseCount }, (_, index) => index + 1).map((count) => (
+              <option value={count} key={count}>{count}題・{exerciseCountLabel(count, maxExerciseCount)}</option>
+            ))}
           </select>
         </label>
         <label>
@@ -686,7 +954,6 @@ export default function Home() {
   const [mistakes, setMistakes] = useState<Record<string, number>>({});
   const [targetFingerErrors, setTargetFingerErrors] = useState<Record<string, number>>({});
   const [wrongKey, setWrongKey] = useState<string | null>(null);
-  const [status, setStatus] = useState("入力を続けられます");
   const [paused, setPaused] = useState(false);
   const [sessionStart, setSessionStart] = useState(0);
   const [result, setResult] = useState<SessionRecord | null>(null);
@@ -712,9 +979,11 @@ export default function Home() {
     window.scrollTo(0, 0);
   }, [screen]);
 
+  const availableExerciseCount = EXERCISES[scene].length;
+  const selectedExerciseCount = Math.min(settings.exerciseCount, availableExerciseCount);
   const exercises = useMemo<Exercise[]>(() => {
-    return EXERCISES[scene].slice(0, settings.exerciseCount);
-  }, [scene, settings.exerciseCount]);
+    return EXERCISES[scene].slice(0, selectedExerciseCount);
+  }, [scene, selectedExerciseCount]);
 
   const exercise = exercises[exerciseIndex] || exercises[0];
   const target = exercise?.input[charIndex] || "";
@@ -790,12 +1059,11 @@ export default function Home() {
       if (exerciseIndex + 1 < exercises.length) {
         setExerciseIndex((value) => value + 1);
         setCharIndex(0);
-        setStatus(isJavaScene(scene) ? "次のスニペットへ進みました" : "次の文章へ進みました");
         return;
       }
       finishSession(nextCorrect, nextMistakes, nextFingerErrors);
     },
-    [charIndex, exercise.input.length, exerciseIndex, exercises.length, finishSession, scene],
+    [charIndex, exercise.input.length, exerciseIndex, exercises.length, finishSession],
   );
 
   useEffect(() => {
@@ -821,7 +1089,6 @@ export default function Home() {
         const nextCorrect = correct + 1;
         setCorrect(nextCorrect);
         setWrongKey(null);
-        setStatus("入力を続けられます");
         playTone(true);
         advance(nextCorrect, mistakes, targetFingerErrors);
         return;
@@ -835,7 +1102,6 @@ export default function Home() {
       setMistakes(nextMistakes);
       setTargetFingerErrors(nextFingerErrors);
       setWrongKey(key);
-      setStatus(`${displayKey(target)} は ${targetInfo.label}（${targetInfo.zone}）`);
       playTone(false);
       if (wrongTimer.current) window.clearTimeout(wrongTimer.current);
       wrongTimer.current = window.setTimeout(() => setWrongKey(null), 650);
@@ -854,7 +1120,6 @@ export default function Home() {
     target,
     targetFingerErrors,
     targetInfo.label,
-    targetInfo.zone,
   ]);
 
   useEffect(
@@ -871,11 +1136,6 @@ export default function Home() {
     setMistakes({});
     setTargetFingerErrors({});
     setWrongKey(null);
-    setStatus(
-      isJavaScene(scene)
-        ? "Javaコードを見ながら、そのまま入力してください"
-        : "文章を見ながら、そのまま入力してください",
-    );
     setPaused(false);
     setResult(null);
     setSessionStart(Date.now());
@@ -891,7 +1151,7 @@ export default function Home() {
 
   return (
     <main
-      className={`${settings.animation ? "" : "no-animation"} ${settings.largeGuide ? "large-guide" : "compact-guide"} ${screen === "practice" ? "practice-mode" : ""}`}
+      className={`${settings.animation ? "" : "no-animation"} ${settings.largeGuide ? "large-guide" : "compact-guide"} ${screen === "practice" ? "practice-mode" : ""} ${screen === "practice" && isJavaScene(scene) ? "java-practice" : ""}`}
       style={style}
     >
       <div className="desktop-note">
@@ -917,7 +1177,9 @@ export default function Home() {
             <div>
               <span className="section-label">選択中</span>
               <strong>{SCENES[scene].title}</strong>
-              <small>{exercises[0].context}・{settings.exerciseCount}{isJavaScene(scene) ? "本" : "文"}</small>
+              <small>
+                {exercises[0].context}・{exercises.length} / {availableExerciseCount}{isJavaScene(scene) ? "本" : "文"}
+              </small>
             </div>
             <div className="scene-start-actions">
               <button className="primary-button" onClick={startPractice}>
@@ -954,7 +1216,7 @@ export default function Home() {
 
           <section className="practice-collection java-collection">
             <div className="collection-heading">
-              <div><span>02</span><h2>Java編</h2><b>NEW</b></div>
+              <div><span>02</span><h2>Java編</h2></div>
               <p>記号・数字・Shift・Enterまで含むコード写経</p>
             </div>
             <div className="scene-grid">
@@ -1050,7 +1312,16 @@ export default function Home() {
                 {isJavaScene(scene) ? (
                   <>
                     <p>{exercise.description}</p>
-                    <pre>{exercise.input}</pre>
+                    <pre className="tracked-source" aria-label={`写経するJavaコード ${exercise.input}`}>
+                      {exercise.input.split("").map((char, index) => (
+                        <span
+                          className={`${index < charIndex ? "done" : ""} ${index === charIndex ? "current" : ""}`}
+                          key={`${char}-${index}`}
+                        >
+                          {char === "\n" ? (index === charIndex ? "↵\n" : "\n") : char}
+                        </span>
+                      ))}
+                    </pre>
                   </>
                 ) : (
                   <>
@@ -1058,16 +1329,6 @@ export default function Home() {
                     <strong>{exercise.description}</strong>
                   </>
                 )}
-              </div>
-
-              <div className="next-input" aria-label={`次に入力する文字 ${displayKey(target)}`}>
-                <span>次に入力</span>
-                <strong className={displayKey(target).length > 2 ? "word-key" : ""}>{displayKey(target)}</strong>
-              </div>
-
-              <div className={`quiet-feedback ${wrongKey ? "error" : ""}`} role="status" aria-live="polite">
-                <span aria-hidden="true">{wrongKey ? "×" : "●"}</span>
-                {status}
               </div>
 
               <div className="up-next">
@@ -1175,7 +1436,12 @@ export default function Home() {
       )}
 
       {settingsOpen && (
-        <SettingsPanel settings={settings} onChange={setSettings} onClose={() => setSettingsOpen(false)} />
+        <SettingsPanel
+          settings={settings}
+          maxExerciseCount={availableExerciseCount}
+          onChange={setSettings}
+          onClose={() => setSettingsOpen(false)}
+        />
       )}
 
       {historyOpen && (

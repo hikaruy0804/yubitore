@@ -168,7 +168,6 @@ h1, h2, .brand span, .result-stats strong {
 .collection-heading > div { display: flex; align-items: center; gap: 12px; }
 .collection-heading > div > span { color: var(--terra); font-family: "Yu Mincho",serif; font-size: 1.4rem; }
 .collection-heading h2 { margin: 0; font-size: 1.55rem; }
-.collection-heading b { border-radius: 99px; background: var(--terra); padding: 3px 8px; color: white; font-size: .65rem; letter-spacing: .08em; }
 .collection-heading p { margin: 0; color: var(--soft); font-size: .78rem; }
 .scene-grid { display: grid; gap: 14px; grid-template-columns: repeat(3,1fr); }
 .practical-grid { grid-template-columns: repeat(2,1fr); }
@@ -250,7 +249,7 @@ h1, h2, .brand span, .result-stats strong {
   gap: 10px;
   margin: 0 auto;
   grid-template-columns: 1fr;
-  grid-template-rows: 232px minmax(0,1fr);
+  grid-template-rows: 200px minmax(0,1fr);
   padding: 10px 0 12px;
 }
 .compact-guide .practice-layout { grid-template-columns: 1fr; }
@@ -299,36 +298,6 @@ h1, h2, .brand span, .result-stats strong {
   tab-size: 4;
   white-space: pre;
 }
-.next-input {
-  display: flex;
-  min-height: 38px;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 5px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: rgba(241,215,199,.24);
-}
-.next-input > span { color: var(--soft); font-size: .72rem; font-weight: 800; }
-.next-input > strong {
-  display: grid;
-  min-width: 46px;
-  height: 30px;
-  place-items: center;
-  border: 2px solid var(--terra);
-  border-radius: 6px;
-  background: var(--paper-light);
-  color: var(--terra);
-  font-family: ui-monospace,"SFMono-Regular",Consolas,monospace;
-  font-size: 1.25rem;
-  line-height: 1;
-}
-.next-input > strong.word-key {
-  min-width: 74px;
-  padding-inline: 8px;
-  font-size: .78rem;
-}
 .roman-label { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 9px; }
 .roman-label > span { font-weight: 800; }
 .roman-label small { color: var(--soft); }
@@ -364,23 +333,6 @@ h1, h2, .brand span, .result-stats strong {
   color: var(--terra);
   font-weight: 900;
 }
-
-.quiet-feedback {
-  display: flex;
-  min-height: 48px;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: rgba(220,229,216,.28);
-  padding: 12px 14px;
-  color: var(--soft);
-  font-size: .84rem;
-}
-.quiet-feedback > span { color: var(--sage-dark); font-size: .62rem; }
-.quiet-feedback.error { color: var(--danger); font-weight: 800; }
-.quiet-feedback.error > span { display: grid; width: 22px; height: 22px; place-items: center; border: 1px solid; border-radius: 50%; color: var(--danger); font-size: .8rem; }
 
 .up-next { margin-top: 24px; border-top: 1px dotted var(--line-dark); padding-top: 18px; }
 .up-next p { margin: 9px 0 0; color: var(--soft); font-family: "Yu Mincho",serif; font-size: 1.15rem; }
@@ -683,11 +635,25 @@ h1, h2, .brand span, .result-stats strong {
   line-height: 1.45;
   text-align: left;
 }
-.practice-mode .quiet-feedback {
-  min-height: 30px;
-  margin-top: 5px;
-  padding: 4px 10px;
-  font-size: .76rem;
+.java-practice .practice-layout {
+  grid-template-rows: max-content minmax(0,1fr);
+}
+.java-practice .source-code {
+  padding-block: 10px;
+}
+.java-practice .source-code pre {
+  max-height: none;
+  font-size: clamp(.8rem,1vw,.94rem);
+  line-height: 1.4;
+}
+.java-practice .input-tracker { display: none; }
+.tracked-source > span { transition: color 100ms ease, background 100ms ease; }
+.tracked-source > span.done { color: #87928d; }
+.tracked-source > span.current {
+  border-bottom: 2px solid var(--terra);
+  background: var(--terra-soft);
+  color: var(--terra);
+  font-weight: 900;
 }
 .practice-mode .up-next { display: none; }
 .practice-mode .input-tracker {
@@ -697,11 +663,12 @@ h1, h2, .brand span, .result-stats strong {
 .practice-mode .roman-label { margin-bottom: 2px; font-size: .65rem; }
 .practice-mode .roman-label small { display: none; }
 .practice-mode .roman-line {
-  min-height: 20px;
-  max-height: 24px;
+  min-height: 29px;
+  max-height: 34px;
   overflow: hidden;
-  font-size: .7rem;
-  line-height: 1.6;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.55;
   white-space: nowrap;
 }
 .practice-mode .finger-priority { width: min(920px,100%); }

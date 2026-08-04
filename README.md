@@ -1,115 +1,221 @@
-# vinext-starter
+# ゆびトレ 要求仕様
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+## 1. 文書の目的
 
-## Prerequisites
+本書は、タイピング練習アプリ「ゆびトレ」が満たすべき要求を、利用者・プロダクトの視点で定義する。
 
-- Node.js `>=22.13.0`
-- macOS or Linux for local development
-- `flock`, `curl`, GNU `timeout`, and `sha256sum` only when running the
-  Linux-oriented `npm run install:ci` helper
+実装方式、状態管理、データ構造、キー判定などの技術仕様は [DEV.md](./DEV.md) を参照すること。
 
-## Sites Lifecycle
+## 2. サービス概要
 
-The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
+「ゆびトレ」は、すでに文字入力ができる人が、実務文章やJavaコードを入力しながら正しい指づかいを確認するためのWebアプリである。
 
-This starter does not use `wrangler.jsonc`.
+入力速度を競うのではなく、文章の入力位置と、その文字を担当する手・指を確認できることを重視する。
 
-`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. This install helper targets Linux. `build` uses a Node.js timeout wrapper and works on macOS and Linux before validating the Sites artifact.
+## 3. 背景と解決する課題
 
-For normal local development on macOS, use `npm install` followed by
-`npm run dev`; `npm run install:ci` is not required. `.nvmrc` and
-`.node-version` pin the tested Node.js release, and the main lifecycle commands
-fail early with a clear message when an older runtime is active.
+一般的なタイピング練習は、初心者向けのローマ字学習や速度・スコアの競争が中心である。一方、入力自体はできても、自己流の指づかいを直したい利用者には次の課題がある。
 
-Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
+- 入力中に、次の文字をどの指で押すべきか分かりにくい。
+- 文字と指ガイドの位置が離れていると視線移動が大きい。
+- 説明や確認操作が多いと、練習開始までに疲れる。
+- 単純な単語ではなく、実際に使う文章やコードで練習したい。
+- 速度評価があると、指づかいより速さを優先してしまう。
 
-## Included Shape
+本アプリは、練習メニューからすぐ開始できる導線と、入力対象・次の文字・大きな手の図を同一画面に配置することでこれらを解決する。
 
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+## 4. 対象利用者
 
-## Workspace Auth Headers
+### 4.1 主対象
 
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
+- ローマ字入力や英数字入力がすでにできる人
+- 自己流の指づかいをホームポジション基準へ整えたい人
+- 業務文章を使って練習したい人
+- Javaコードに含まれる英字、数字、記号、Shift、Enterを練習したい人
+- macOS上の物理キーボードで練習する人
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+### 4.2 対象外
 
-Treat the full name as optional and fall back to email when it is absent:
+- ローマ字そのものを学ぶ初心者向け教材
+- 実際にどの指でキーを押したかをカメラやセンサーで判定する機能
+- 速度、WPM、ランキングを中心とした競技タイピング
+- スマートフォンのソフトウェアキーボードを主対象とした練習
 
-```tsx
-import { headers } from "next/headers";
+## 5. プロダクト目標
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+- アプリを開いた直後から練習カテゴリを選べること。
+- カテゴリ選択後、画面上部の開始ボタンからすぐ練習へ進めること。
+- デスクトップ環境では、入力対象と手・指ガイドを原則1画面内に表示すること。
+- 入力位置と、その位置を担当する手・指を同じ画面で確認できること。
+- 誤入力時も練習の流れを止めず、正しい文字と担当指を示すこと。
+- 練習後に正確率と誤入力傾向を確認できること。
 
-  const displayName = fullName ?? email;
-  // ...
-}
+## 6. 機能要求
+
+### FR-01 練習メニュー
+
+- 初期表示は説明用ランディング画面ではなく、練習メニューとする。
+- 実務文章とJavaのカテゴリを分けて表示する。
+- 選択中のカテゴリを視覚的かつアクセシブルに示す。
+- 選択中の練習名、最初の課題、課題数を画面上部に表示する。
+- 開始ボタンは下部まで探さなくても操作できる位置に配置する。
+- デスクトップでは、開始エリアをスクロール中も見つけやすくする。
+
+### FR-02 練習コンテンツ
+
+実務文章の各カテゴリは12課題、Javaの各カテゴリは8課題を持つ。設定により、1回に使用する課題数をカテゴリの収録数まで選択できること。
+
+| 区分 | カテゴリ | 内容 | 収録数 |
+| --- | --- | --- | ---: |
+| 実務文章 | 業務メール | 確認、依頼、お礼、おわび、添付、回答 | 12文 |
+| 実務文章 | 会議メモ | 日時、決定事項、担当、議題、宿題、共有 | 12文 |
+| 実務文章 | チャット返信 | 確認、完了、待機、相談、共有、作業報告 | 12文 |
+| 実務文章 | 文書作成 | 提案、報告、手順、改善、調査、実施条件 | 12文 |
+| Java | クラスとmain | クラス、mainメソッド、標準出力 | 8本 |
+| Java | 変数と型 | 数値、文字列、真偽値、配列、再代入 | 8本 |
+| Java | 条件分岐 | if、else、比較、三項演算、入れ子 | 8本 |
+| Java | 繰り返し | for、拡張for、while、break、continue | 8本 |
+| Java | メソッド | 引数、戻り値、配列、入れ子の呼び出し | 8本 |
+
+### FR-03 入力練習
+
+- 実務文章では日本語文を上部に表示し、対応するローマ字を入力対象とする。
+- 実務文章のローマ字は単語間スペースを含めず、Space入力を要求しない。発音表記ではなく日本語IMEのキー入力を基準とし、助詞の「を」は `wo`、「は」は `ha`、「へ」は `he` とする。「ん」は母音の直前または文末では `nn` とする。
+- Javaではコード全文を上部に省略せず表示し、表示されたコードをそのまま入力対象とする。
+- Javaではコード内の現在の入力位置を1文字単位で強調し、入力済みの範囲を区別する。
+- 正しい文字を入力した場合のみ、次の文字へ進む。
+- 誤った文字を入力した場合は、入力位置を進めない。
+- 課題の最後の文字を入力すると、自動的に次の課題へ進む。
+- 最終課題の完了後は、自動的に結果画面へ進む。
+- Escapeキーまたは一時停止ボタンで練習を一時停止できること。
+
+### FR-04 入力位置
+
+- 実務文章では、入力位置を確認するローマ字を補助情報として下部に小さく表示する。
+- Javaでは、上部に表示したコード全文の中で入力位置を示し、同じコードを下部へ重複表示しない。
+- 入力済み文字を薄くし、現在位置の1文字だけを強調する。
+- 「次に入力」専用カード、通常時のステータス、残り文字数、文章内進捗率は表示しない。
+- 入力に合わせて現在位置を即時更新する。
+
+### FR-05 指ガイド
+
+- 次の文字を担当する左右の手と指名を表示する。
+- 両手の図を中央に表示し、対象の手・指を強調する。
+- 指番号、担当キー範囲、押す物理キー、ホーム位置へ戻す案内を表示する。
+- Shiftが必要な場合は、対象キーと反対側のShiftキーを案内する。
+- Spaceは親指、Enterは右手小指として案内する。
+- 指ガイドは実際に利用者が使用した指を検出するものではなく、対象文字に割り当てられた標準担当指を示すものとする。
+
+### FR-06 誤入力の記録
+
+- 誤入力時も入力位置を進めず、現在位置と指ガイドを維持する。
+- 通常時・誤入力時ともに、文章と指ガイドの間へ追加メッセージを表示しない。
+- 誤入力したキーごとの回数を記録する。
+- 誤入力時点の正解文字に対応する担当指ごとの回数を記録する。
+- 設定が有効な場合、正解・誤入力を短い効果音で区別する。
+
+### FR-07 一時停止
+
+- 一時停止中はキー入力判定を停止する。
+- 現在の入力位置を保持したまま再開できること。
+- 最初からやり直す、または練習メニューへ戻る操作を提供する。
+
+### FR-08 結果
+
+- 練習完了後、正確率、誤入力回数、練習時間を表示する。
+- 誤入力が多かったキーを最大5件表示する。
+- 担当指別の誤入力を最大4件表示する。
+- 同じ練習を再実行する、別の練習を選ぶ、練習メニューへ戻る操作を提供する。
+- 速度は評価対象にしない。
+
+### FR-09 練習履歴
+
+- 完了した練習結果を利用端末のブラウザ内に保存する。
+- 履歴には実施日、カテゴリ、正確率、正解文字数、誤入力、担当指別誤入力、所要時間を保持する。
+- 保存件数は最大40件とする。
+- 履歴画面では新しいものから最大12件を一覧表示する。
+- 利用者が端末内の履歴をすべて削除できること。
+
+### FR-10 設定
+
+- 1回の課題数は、実務文章では1〜12文、Javaでは1〜8本から選択できること。
+- 文字サイズを90%、100%、110%、120%から選択できること。
+- 指ガイドの拡大表示を切り替えられること。
+- 効果音を切り替えられること。
+- 指の強調アニメーションを切り替えられること。
+- 設定は利用端末のブラウザ内に保存する。
+
+## 7. UI・レイアウト要求
+
+- 練習画面では、上部に入力対象と小さな入力位置表示を配置する。
+- その下の大部分を、中央揃えの手・指ガイドに使用する。
+- デスクトップの標準的な画面では、入力対象と手の図を同一画面内に収める。
+- ローマ字やコードの入力位置表示は主役にせず、下部に小さく配置する。
+- 練習中は通常ヘッダーを隠し、入力に必要な情報を優先する。
+- 小さい画面では内容の欠落を避けるため、縦スクロールへ切り替える。
+- 1023px以下では、物理キーボードを接続したPCでの利用を案内する。
+
+## 8. 非機能要求
+
+### 8.1 対応環境
+
+- 主対象はmacOS上のデスクトップブラウザと物理キーボードとする。
+- 推奨表示領域は1024×720以上とする。
+- 指ガイドの物理キー表記は日本語JIS配列を基準とする。
+- ローマ字入力時はIMEを英数入力へ切り替えて利用する。
+
+### 8.2 アクセシビリティ
+
+- 操作可能要素にはキーボードフォーカスを表示する。
+- モーダル、スイッチ、選択状態、進捗、手・キーボード図に適切なARIA情報を付与する。
+- OSの「視差効果を減らす」設定を尊重する。
+- 効果音が無効または再生できない場合も、視覚フィードバックだけで利用できること。
+
+### 8.3 プライバシーとデータ
+
+- アカウント登録を要求しない。
+- 練習履歴と設定はブラウザのローカルストレージへ保存する。
+- サーバー、D1、R2などへ個人の練習データを送信しない。
+- 別端末間の同期は行わない。
+
+### 8.4 性能・信頼性
+
+- 正誤判定と次の文字・指の更新は、入力直後に行う。
+- 不正な保存データを読み込めない場合は、既定設定または空の履歴へ戻す。
+- 対応外のキーや修飾キー付きショートカットは、練習結果へ影響させない。
+
+## 9. 受け入れ条件
+
+- アプリを開くと、説明画面を経由せず練習メニューが表示される。
+- 任意のカテゴリを選び、上部の開始ボタンから練習を開始できる。
+- 練習開始直後に、最初の入力文字とその担当指が一致して表示される。
+- 正しいキーを押すと、入力位置と担当指が更新される。
+- 誤ったキーを押しても入力位置は進まず、正しいキーと担当指が示される。
+- 実務文章とJavaの各カテゴリで、設定した課題数を最後まで実行できる。
+- 完了後に正確率、誤入力、練習時間、誤入力傾向が表示される。
+- 設定と履歴を端末内に保存し、履歴を利用者が削除できる。
+- デスクトップ表示では、入力対象と手・指ガイドを同一画面で確認できる。
+
+## 10. 要求対象外
+
+- WPM、入力速度、ランキング、対戦
+- 実際に使用した指の自動検出
+- ユーザーアカウント、ログイン、クラウド同期
+- 利用者が自由文や独自コードを登録する機能
+- 練習コンテンツのサーバー配信や管理画面
+- モバイルのフリック入力・ソフトウェアキーボード対応
+
+## 11. ローカル実行の前提
+
+- Node.js 22.13.0以上
+- npm
+- macOSまたはLinux
+
+macOSでの基本的な起動方法は次のとおり。
+
+```bash
+npm install
+npm run dev
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
-
-## Diagnostic Commands
-
-- `npm run install:ci`: perform the one bounded lockfile install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build and validate the deployable Sites artifact
-- `npm run start`: start the built Vinext application
-- `npm test`: build, validate, and verify the rendered development-preview metadata
-- `npm run validate:artifact`: recheck an existing artifact's manifest and ESM `default.fetch` export
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-Use build and validation commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
-
-The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+詳細な開発・ビルド手順は [DEV.md](./DEV.md) を参照すること。
