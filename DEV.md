@@ -121,7 +121,7 @@ type Settings = {
 | `sound` | `false` | 正誤効果音の有無 |
 | `animation` | `true` | 対象指の強調アニメーション |
 | `largeGuide` | `true` | 手の図を大きく表示 |
-| `exerciseCount` | `5` | 1〜12課題。カテゴリの収録数を上限とする |
+| `exerciseCount` | `5` | 1〜16課題。カテゴリの収録数を上限とする |
 | `fontScale` | `1` | 0.9、1.0、1.1、1.2 |
 
 ### 4.6 `SessionRecord`
@@ -133,9 +133,9 @@ type SessionRecord = {
   scene: string;
   accuracy: number;
   correct: number;
+  exerciseCount: number;
   mistakes: Record<string, number>;
   targetFingerErrors: Record<string, number>;
-  durationSec: number;
 };
 ```
 
@@ -196,10 +196,9 @@ correct = 0
 mistakes = {}
 targetFingerErrors = {}
 wrongKey = null
-sessionStart = 現在時刻
 ```
 
-`settings.exerciseCount` と選択カテゴリの収録数の小さい方をセッション課題数とし、カテゴリの先頭からその件数を `slice` して使用する。実務文章は最大12文、Javaは最大8本とする。
+`settings.exerciseCount` と選択カテゴリの収録数の小さい方をセッション課題数とし、カテゴリの先頭からその件数を `slice` して使用する。実務文章は最大16文、Javaは最大12本とする。
 
 #### 上部ツールバー
 
@@ -220,6 +219,7 @@ sessionStart = 現在時刻
 
 - 実務文章: `description` の日本語文を大きく表示
 - Java: `input` のコード全文を等幅フォントで省略せず表示し、現在の1文字をコード内で強調
+- `context`を課題の短い用途として入力対象の直前に表示
 - 実務文章のみ、下部にローマ字の全文字列を小さく表示
 - 独立した「次に入力」カードと通常ステータスは表示しない
 
@@ -273,16 +273,16 @@ accuracy = round(correct / attempts * 100)
 
 `attempts`が0の場合は100%とする。
 
-練習時間は開始時刻との差を秒で保存し、画面では1分未満を含め最低1分として切り上げ表示する。
-
 表示内容:
 
 - 正確率
 - 正しく入力した文字数
 - 誤入力回数
-- 練習時間
+- 完了した課題数
 - 誤入力の多いキー上位5件
 - 担当指別誤入力上位4件
+
+経過時間、WPM、入力速度は計測・保存・表示しない。
 
 ### 6.5 設定モーダル
 
@@ -488,7 +488,7 @@ Linux CI向けの `npm run install:ci` は `flock`、GNU `timeout`、`curl`、`s
 
 - 初期表示が練習メニューであること
 - 全9カテゴリを選択できること
-- 実務文章では課題数1〜12、Javaでは課題数1〜8が反映されること
+- 実務文章では課題数1〜16、Javaでは課題数1〜12が反映されること
 - 実務文章でSpace入力を要求されないこと
 - 正解時のみ次の文字へ進むこと
 - 誤入力時に位置が変わらないこと
@@ -504,7 +504,7 @@ Linux CI向けの `npm run install:ci` は `flock`、GNU `timeout`、`curl`、`s
 - 物理キー案内は日本語JIS配列を基準とする。
 - IMEの状態はアプリから強制変更しない。
 - 対応表にない文字は入力対象として扱えない。
-- 速度、WPM、ランキングは集計しない。
+- 制限時間、経過時間、速度、WPM、ランキングは計測・集計・表示しない。
 - 履歴と設定はブラウザ単位であり、端末間同期しない。
 - 720px以下では1画面固定を解除し、縦スクロールを許可する。
 - 自動テストはビルドとHTML応答が中心で、キー入力のE2Eテストは未整備である。
