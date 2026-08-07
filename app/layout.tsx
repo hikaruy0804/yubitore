@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ゆっくりタイピング — 正しい指で覚えるタイピング練習",
+  title: "ゆっくりタイピング",
   description: "速さを競わず、一文字ずつ正しい指づかいを練習するタイピングアプリ。",
   other: {
     "codex-preview": "development",
