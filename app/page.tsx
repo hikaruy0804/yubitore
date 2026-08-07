@@ -979,7 +979,7 @@ function sortedMistakes(mistakes: Record<string, number>) {
 function Brand({ onClick }: { onClick: () => void }) {
   return (
     <button className="brand" onClick={onClick} aria-label="練習メニューへ">
-      <span>ゆびトレ</span>
+      <span>ゆっくりタイピング</span>
       <small>文章やコードを打ちながら、指だけ整える</small>
     </button>
   );
