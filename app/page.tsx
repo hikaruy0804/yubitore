@@ -396,10 +396,6 @@ function PracticePreview({
   return (
     <div className="overlay preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
       <section className="practice-preview">
-        <div className="preview-breath" aria-hidden="true">
-          <i />
-          <span>ひと呼吸</span>
-        </div>
         <p className="eyebrow">{sceneTitle}・全{exerciseCount}文</p>
         <h2 id="preview-title">最初の文章を確認しましょう</h2>
         <p className="preview-lead">意味と流れをつかんでから、落ち着いて入力を始めます。</p>
@@ -650,18 +646,10 @@ export default function Home() {
 
       {screen === "scenes" && (
         <div className="page-shell inner-page">
-          <section className="calm-hero" aria-labelledby="calm-hero-title">
-            <div className="calm-hero-copy">
-              <p className="eyebrow">急がなくていい、指の動きを確かめよう</p>
-              <h1 id="calm-hero-title">一文字ずつ、<span>ゆっくり。</span></h1>
-              <p>速さではなく、文章の意味と正しい指づかいをそろえる練習です。肩の力を抜いて、今日の一題を選んでください。</p>
-            </div>
-            <div className="slow-rhythm" aria-hidden="true">
-              <div className="rhythm-key"><span>F</span><small>左手</small></div>
-              <div className="rhythm-breath"><i /><i /><i /><b>すう</b><em>はく</em></div>
-              <div className="rhythm-key"><span>J</span><small>右手</small></div>
-            </div>
-          </section>
+          <div className="page-title">
+            <p className="eyebrow">練習メニュー</p>
+            <h1>練習を選ぶ</h1>
+          </div>
 
           <section className="scene-start-bar" aria-label="選択中の練習">
             <div>
@@ -832,9 +820,24 @@ export default function Home() {
 
               <div className="input-tracker">
                 <div className="roman-label">
-                  <span>{isJavaScene(scene) ? "入力位置" : "ローマ字の入力位置"}</span>
-                  <small>入力済みは薄く、次の1文字だけを強調</small>
+                  <span>{isJavaScene(scene) ? "入力位置" : "ローマ字の入力状況"}</span>
+                  <small>{charIndex} / {exercise.input.length}文字</small>
                 </div>
+                {!isJavaScene(scene) && (
+                  <div
+                    className={`typed-romaji ${wrongKey ? "has-error" : ""}`}
+                    role="status"
+                    aria-live="polite"
+                    aria-label={`入力済みのローマ字 ${exercise.input.slice(0, charIndex) || "なし"}`}
+                  >
+                    <span>
+                      {charIndex > 30 && <small aria-hidden="true">…</small>}
+                      {exercise.input.slice(Math.max(0, charIndex - 30), charIndex) || <em>入力した文字がここに表示されます</em>}
+                    </span>
+                    <i aria-hidden="true" />
+                    {wrongKey && <b>× {displayKey(wrongKey)}</b>}
+                  </div>
+                )}
                 <div
                   className="roman-line code-input"
                   aria-label={`${isJavaScene(scene) ? "入力するJavaコード" : "入力するローマ字"} ${exercise.input}`}
