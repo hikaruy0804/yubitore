@@ -1,20 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { EXERCISES, type Exercise, type SceneId } from "./data/exercises";
 
 type Hand = "left" | "right" | "thumb";
 type Finger = "pinky" | "ring" | "middle" | "index" | "thumb";
 type Screen = "scenes" | "practice" | "result";
-type SceneId =
-  | "mail"
-  | "meeting"
-  | "chat"
-  | "document"
-  | "hello"
-  | "variables"
-  | "condition"
-  | "loop"
-  | "method";
 
 type KeyInfo = {
   hand: Hand;
@@ -25,13 +16,6 @@ type KeyInfo = {
   number: number;
   physicalKey: string;
   shift?: boolean;
-};
-
-type Exercise = {
-  id: string;
-  context: string;
-  description: string;
-  input: string;
 };
 
 type SessionRecord = {
@@ -121,771 +105,6 @@ const JAVA_SCENES: SceneId[] = ["hello", "variables", "condition", "loop", "meth
 function isJavaScene(scene: SceneId) {
   return JAVA_SCENES.includes(scene);
 }
-
-const EXERCISES: Record<SceneId, Exercise[]> = {
-  mail: [
-    {
-      id: "mail-1",
-      context: "資料を受け取ったあとの確認メール",
-      description: "お世話になっております。資料を確認しました。",
-      input: "osewaninatteorimasu.shiryouwokakuninshimashita.",
-    },
-    {
-      id: "mail-2",
-      context: "日程を調整するときの依頼メール",
-      description: "ご都合のよい時間をお知らせください。",
-      input: "gotsugounoyoijikanwooshirasekudasai.",
-    },
-    {
-      id: "mail-3",
-      context: "対応へのお礼を伝えるメール",
-      description: "早速のご対応、ありがとうございます。",
-      input: "sassokunogotaiou,arigatougozaimasu.",
-    },
-    {
-      id: "mail-4",
-      context: "返信が遅れたときのおわび",
-      description: "ご返信が遅くなり、申し訳ございません。",
-      input: "gohenshingaosokunari,moushiwakegozaimasenn.",
-    },
-    {
-      id: "mail-5",
-      context: "確認をお願いする結びのメール",
-      description: "お手数ですが、ご確認のほどよろしくお願いします。",
-      input: "otesuudesuga,gokakuninnohodoyoroshikuonegaishimasu.",
-    },
-    {
-      id: "mail-6",
-      context: "資料を添付したときの案内",
-      description: "会議資料を添付しましたので、ご確認ください。",
-      input: "kaigishiryouwotenpushimashitanode,gokakuninkudasai.",
-    },
-    {
-      id: "mail-7",
-      context: "質問を受け付ける結び",
-      description: "ご不明な点がございましたら、お知らせください。",
-      input: "gofumeinatengagozaimashitara,oshirasekudasai.",
-    },
-    {
-      id: "mail-8",
-      context: "回答期限を伝えるメール",
-      description: "本件について、明日までに回答いたします。",
-      input: "honkennitsuite,ashitamadenikaitouitashimasu.",
-    },
-    {
-      id: "mail-9",
-      context: "見積書を再送するメール",
-      description: "念のため、見積書を再送いたします。",
-      input: "nennotame,mitsumorishowosaisouitashimasu.",
-    },
-    {
-      id: "mail-10",
-      context: "承認期限を伝える依頼",
-      description: "明日の正午までに、承認をお願いします。",
-      input: "ashitanoshougomadeni,shouninwoonegaishimasu.",
-    },
-    {
-      id: "mail-11",
-      context: "日程候補を送るメール",
-      description: "日程の候補を三つお送りしました。",
-      input: "nitteinokouhowomittsuookurishimashita.",
-    },
-    {
-      id: "mail-12",
-      context: "質問へ回答するメール",
-      description: "ご質問への回答を本文に記載しました。",
-      input: "goshitsumonhenokaitouwohonbunnikisaishimashita.",
-    },
-    {
-      id: "mail-13",
-      context: "会議日程の変更依頼",
-      description: "会議の日程を来週へ変更できますでしょうか。",
-      input: "kaiginonitteiworaishuuhehenkoudekimasudeshouka.",
-    },
-    {
-      id: "mail-14",
-      context: "請求書を受け取った連絡",
-      description: "請求書を受領しました。内容を確認します。",
-      input: "seikyuushowojuryoushimashita.naiyouwokakuninshimasu.",
-    },
-    {
-      id: "mail-15",
-      context: "添付漏れを知らせるメール",
-      description: "添付ファイルが見当たりませんので、再送をお願いします。",
-      input: "tenpufairugamiatarimasennode,saisouwoonegaishimasu.",
-    },
-    {
-      id: "mail-16",
-      context: "修正版を送付するメール",
-      description: "修正版をお送りしますので、ご確認をお願いします。",
-      input: "shuuseibanwoookurishimasunode,gokakuninwoonegaishimasu.",
-    },
-  ],
-  meeting: [
-    {
-      id: "meeting-1",
-      context: "次回会議の予定",
-      description: "次回の会議は火曜日の午後二時からです。",
-      input: "jikainokaigihakayoubinogogonijikaradesu.",
-    },
-    {
-      id: "meeting-2",
-      context: "会議で決まったこと",
-      description: "新しい案を金曜日までに確認します。",
-      input: "atarashiianwokinyoubimadenikakuninshimasu.",
-    },
-    {
-      id: "meeting-3",
-      context: "担当と次の行動",
-      description: "担当者が内容を整理して共有します。",
-      input: "tantoushaganaiyouwoseirishitekyouyuushimasu.",
-    },
-    {
-      id: "meeting-4",
-      context: "議題の確認",
-      description: "本日の議題は、計画と予算の確認です。",
-      input: "honjitsunogidaiha,keikakutoyosannokakunindesu.",
-    },
-    {
-      id: "meeting-5",
-      context: "保留事項の記録",
-      description: "判断に必要な情報を集め、次回に持ち越します。",
-      input: "handannihitsuyounajouhouwoatsume,jikainimochikoshimasu.",
-    },
-    {
-      id: "meeting-6",
-      context: "次回までの宿題",
-      description: "次回までに担当ごとの課題を整理します。",
-      input: "jikaimadenitantougotonokadaiwoseirishimasu.",
-    },
-    {
-      id: "meeting-7",
-      context: "予算案の再確認",
-      description: "予算案は修正後に再度確認します。",
-      input: "yosannanhashuuseigonisaidokakuninshimasu.",
-    },
-    {
-      id: "meeting-8",
-      context: "議事録の共有",
-      description: "議事録は本日中に参加者へ共有します。",
-      input: "gijirokuhahonjitsuchuunisankashahekyouyuushimasu.",
-    },
-    {
-      id: "meeting-9",
-      context: "優先順位の決定",
-      description: "参加者の意見を踏まえ、優先順位を決めます。",
-      input: "sankashanoikenwofumae,yuusenjunniwokimemasu.",
-    },
-    {
-      id: "meeting-10",
-      context: "未決定項目の確認",
-      description: "未決定の項目は、担当部署へ確認します。",
-      input: "miketteinokoumokuha,tantoubushohekakuninshimasu.",
-    },
-    {
-      id: "meeting-11",
-      context: "会議室の場所を共有",
-      description: "次の会議室は三階の東側です。",
-      input: "tsuginokaigishitsuha,sangainohigashigawadesu.",
-    },
-    {
-      id: "meeting-12",
-      context: "期限延長の合意",
-      description: "期限を一週間延長することで合意しました。",
-      input: "kigenwoisshuukannenchousurukotodegouishimashita.",
-    },
-    {
-      id: "meeting-13",
-      context: "課題と対応策の確認",
-      description: "進行上の課題と対応策を確認しました。",
-      input: "shinkoujounokadaitotaiousakuwokakuninshimashita.",
-    },
-    {
-      id: "meeting-14",
-      context: "担当者と期限の決定",
-      description: "各作業の担当者と期限を決定しました。",
-      input: "kakusagyounotantoushatokigenwoketteishimashita.",
-    },
-    {
-      id: "meeting-15",
-      context: "次回議題の共有",
-      description: "次回は利用者からの意見を検討します。",
-      input: "jikaihariyoushakaranoikenwokentoushimasu.",
-    },
-    {
-      id: "meeting-16",
-      context: "会議中止の記録",
-      description: "本日の会議は都合により中止します。",
-      input: "honjitsunokaigihatsugouniyorichuushishimasu.",
-    },
-  ],
-  chat: [
-    {
-      id: "chat-1",
-      context: "確認依頼への返信",
-      description: "承知しました。内容を確認して折り返します。",
-      input: "shouchishimashita.naiyouwokakuninshiteorikaeshimasu.",
-    },
-    {
-      id: "chat-2",
-      context: "作業完了の連絡",
-      description: "更新が完了しました。ご確認をお願いします。",
-      input: "koushingakanryoushimashita.gokakuninwoonegaishimasu.",
-    },
-    {
-      id: "chat-3",
-      context: "少し待ってもらう返信",
-      description: "確認しますので、少々お待ちください。",
-      input: "kakuninshimasunode,shoushouomachikudasai.",
-    },
-    {
-      id: "chat-4",
-      context: "相談を始めるメッセージ",
-      description: "少しご相談したいことがあります。",
-      input: "sukoshigosoudanshitaikotogaarimasu.",
-    },
-    {
-      id: "chat-5",
-      context: "共有への短い返信",
-      description: "共有ありがとうございます。とても助かります。",
-      input: "kyouyuuarigatougozaimasu.totemotasukarimasu.",
-    },
-    {
-      id: "chat-6",
-      context: "対応開始の連絡",
-      description: "今から対応を始めます。",
-      input: "imakarataiouwohajimemasu.",
-    },
-    {
-      id: "chat-7",
-      context: "確認結果の返信",
-      description: "内容を確認しました。問題ありません。",
-      input: "naiyouwokakuninshimashita.mondaiarimasenn.",
-    },
-    {
-      id: "chat-8",
-      context: "当日作業の完了報告",
-      description: "本日の対応は完了しました。",
-      input: "honjitsunotaiouhakanryoushimashita.",
-    },
-    {
-      id: "chat-9",
-      context: "引き継ぎの連絡",
-      description: "了解です。こちらで引き継ぎます。",
-      input: "ryoukaidesu.kochiradehikitsugimasu.",
-    },
-    {
-      id: "chat-10",
-      context: "急ぎでないことを伝える返信",
-      description: "急ぎではないので、明日で大丈夫です。",
-      input: "isogidehanainode,ashitadedaijoubudesu.",
-    },
-    {
-      id: "chat-11",
-      context: "確認後の連絡を約束",
-      description: "対応方法を確認でき次第、連絡します。",
-      input: "taiouhouhouwokakunindekishidai,renrakushimasu.",
-    },
-    {
-      id: "chat-12",
-      context: "ファイルを再送する連絡",
-      description: "ファイル名を変更して再度送ります。",
-      input: "fairumeiwohenkoushitesaidookurimasu.",
-    },
-    {
-      id: "chat-13",
-      context: "到着が遅れる連絡",
-      description: "会議が長引いているため、十分ほど遅れます。",
-      input: "kaigiganagabiiteirutame,juppunhodookuremasu.",
-    },
-    {
-      id: "chat-14",
-      context: "一部分だけ確認を依頼",
-      description: "この部分だけ、確認をお願いできますか。",
-      input: "konobubundake,kakuninwoonegaidekimasuka.",
-    },
-    {
-      id: "chat-15",
-      context: "連絡内容を訂正",
-      description: "先ほどの連絡に誤りがありました。訂正します。",
-      input: "sakihodonorenrakuniayamarigaarimashita.teiseishimasu.",
-    },
-    {
-      id: "chat-16",
-      context: "対応できる時間を共有",
-      description: "午後三時以降であれば対応できます。",
-      input: "gogosanjikoudearebataioudekimasu.",
-    },
-  ],
-  document: [
-    {
-      id: "document-1",
-      context: "提案書の導入",
-      description: "新しい提案について、要点を三つに整理します。",
-      input: "atarashiiteiannitsuite,youtenwomittsuniseirishimasu.",
-    },
-    {
-      id: "document-2",
-      context: "状況報告の本文",
-      description: "現在の進捗と今後の予定を共有します。",
-      input: "genzainoshinchokutokongonoyoteiwokyouyuushimasu.",
-    },
-    {
-      id: "document-3",
-      context: "手順書の説明",
-      description: "はじめに設定画面を開き、必要な項目を選びます。",
-      input: "hajimenisetteigamenwohiraki,hitsuyounakoumokuwoerabimasu.",
-    },
-    {
-      id: "document-4",
-      context: "改善案のまとめ",
-      description: "課題を整理し、実行しやすい改善策を提案します。",
-      input: "kadaiwoseirishi,jikkoushiyasuikaizensakuwoteianshimasu.",
-    },
-    {
-      id: "document-5",
-      context: "報告書の結論",
-      description: "以上の結果から、次の方針を決定しました。",
-      input: "ijounokekkakara,tsuginohoushinwoketteishimashita.",
-    },
-    {
-      id: "document-6",
-      context: "調査結果の説明",
-      description: "調査結果を表にまとめ、傾向を説明します。",
-      input: "chousakekkawohyounimatome,keikouwosetsumeishimasu.",
-    },
-    {
-      id: "document-7",
-      context: "実施条件の明記",
-      description: "対象範囲と実施期間を明確にします。",
-      input: "taishouhannitojisshikikanwomeikakunishimasu.",
-    },
-    {
-      id: "document-8",
-      context: "手順書への反映",
-      description: "変更点を確認し、手順書へ反映します。",
-      input: "henkoutenwokakuninshi,tejunshohehanneishimasu.",
-    },
-    {
-      id: "document-9",
-      context: "目的と背景の整理",
-      description: "目的と背景を分けて、簡潔に記述します。",
-      input: "mokutekitohaikeiwowakete,kanketsunikijutsushimasu.",
-    },
-    {
-      id: "document-10",
-      context: "書式の統一",
-      description: "各項目の番号と見出しを統一します。",
-      input: "kakukoumokunobangoutomidashiwotouitsushimasu.",
-    },
-    {
-      id: "document-11",
-      context: "具体例の追加",
-      description: "読み手が迷わないよう、具体例を追加します。",
-      input: "yomitegamayowanaiyou,gutaireiwotsuikashimasu.",
-    },
-    {
-      id: "document-12",
-      context: "最終版の配布",
-      description: "最終版を保存し、関係者へ配布します。",
-      input: "saishuubanwohozonshi,kankeishahehaifushimasu.",
-    },
-    {
-      id: "document-13",
-      context: "資料の対象と方法を説明",
-      description: "本資料では、調査の対象と方法を説明します。",
-      input: "honshiryoudeha,chousanotaishoutohouhouwosetsumeishimasu.",
-    },
-    {
-      id: "document-14",
-      context: "利用条件の例外を明記",
-      description: "ただし、一部の条件では利用できません。",
-      input: "tadashi,ichibunojoukendehariyoudekimasenn.",
-    },
-    {
-      id: "document-15",
-      context: "実施後の確認手順",
-      description: "実施後は結果を記録し、担当者が確認します。",
-      input: "jisshigohakekkawokirokushi,tantoushagakakuninshimasu.",
-    },
-    {
-      id: "document-16",
-      context: "次工程の開始条件",
-      description: "次の作業は、承認完了後に開始する予定です。",
-      input: "tsuginosagyouha,shouninkanryougonikaishisuruyoteidesu.",
-    },
-  ],
-  hello: [
-    {
-      id: "hello-1",
-      context: "Hello, Java!",
-      description: "クラス、mainメソッド、標準出力をまとめて写経します。",
-      input: 'public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, Java!");\n    }\n}',
-    },
-    {
-      id: "hello-2",
-      context: "2行の標準出力",
-      description: "同じメソッドを続けて呼び、改行とインデントを練習します。",
-      input: 'public class Greeting {\n    public static void main(String[] args) {\n        System.out.println("Good morning");\n        System.out.println("Welcome to Java");\n    }\n}',
-    },
-    {
-      id: "hello-3",
-      context: "文字列の連結",
-      description: "ダブルクォート、プラス、数字を含む出力です。",
-      input: 'public class Profile {\n    public static void main(String[] args) {\n        System.out.println("Level: " + 3);\n    }\n}',
-    },
-    {
-      id: "hello-4",
-      context: "引数の表示",
-      description: "配列の最初の値を読み、画面へ表示します。",
-      input: 'public class Argument {\n    public static void main(String[] args) {\n        System.out.println(args[0]);\n    }\n}',
-    },
-    {
-      id: "hello-5",
-      context: "計算結果の表示",
-      description: "計算式をprintlnの引数へ直接記述します。",
-      input: 'public class Calculator {\n    public static void main(String[] args) {\n        System.out.println(12 + 8);\n    }\n}',
-    },
-    {
-      id: "hello-6",
-      context: "変数を含むあいさつ",
-      description: "文字列変数を標準出力へ連結します。",
-      input: 'public class Welcome {\n    public static void main(String[] args) {\n        String name = "Aki";\n        System.out.println("Welcome, " + name);\n    }\n}',
-    },
-    {
-      id: "hello-7",
-      context: "真偽値の標準出力",
-      description: "boolean値をprintlnで表示します。",
-      input: "public class Status {\n    public static void main(String[] args) {\n        System.out.println(true);\n    }\n}",
-    },
-    {
-      id: "hello-8",
-      context: "複数の計算を表示",
-      description: "掛け算と足し算を含む式を出力します。",
-      input: "public class Formula {\n    public static void main(String[] args) {\n        System.out.println(4 * 5 + 2);\n    }\n}",
-    },
-    {
-      id: "hello-9",
-      context: "引数の個数を表示",
-      description: "mainメソッドが受け取った引数の個数を表示します。",
-      input: "public class CountArgs {\n    public static void main(String[] args) {\n        System.out.println(args.length);\n    }\n}",
-    },
-    {
-      id: "hello-10",
-      context: "名前を変数に保存して表示",
-      description: "mainメソッド内で文字列変数を宣言して出力します。",
-      input: 'public class UserName {\n    public static void main(String[] args) {\n        String user = "Aoi";\n        System.out.println(user);\n    }\n}',
-    },
-    {
-      id: "hello-11",
-      context: "改行しない出力",
-      description: "printとprintlnを続けて呼び出します。",
-      input: 'public class Inline {\n    public static void main(String[] args) {\n        System.out.print("Loading");\n        System.out.println(" done");\n    }\n}',
-    },
-    {
-      id: "hello-12",
-      context: "平均値の計算と表示",
-      description: "変数へ計算結果を保存し、割り算した値を表示します。",
-      input: "public class Average {\n    public static void main(String[] args) {\n        int total = 24 + 18;\n        System.out.println(total / 2);\n    }\n}",
-    },
-  ],
-  variables: [
-    {
-      id: "variables-1",
-      context: "整数と文字列",
-      description: "型、変数名、代入、セミコロンを練習します。",
-      input: 'int count = 3;\nString message = "Hello";\nSystem.out.println(message + count);',
-    },
-    {
-      id: "variables-2",
-      context: "小数の計算",
-      description: "double型と小数点、掛け算を含むコードです。",
-      input: "double price = 120.5;\nint amount = 2;\ndouble total = price * amount;",
-    },
-    {
-      id: "variables-3",
-      context: "boolean型",
-      description: "比較結果を真偽値として変数へ代入します。",
-      input: "int score = 82;\nboolean passed = score >= 80;",
-    },
-    {
-      id: "variables-4",
-      context: "文字と真偽値",
-      description: "char型とboolean型の宣言を続けて入力します。",
-      input: "char grade = 'A';\nboolean active = true;",
-    },
-    {
-      id: "variables-5",
-      context: "配列の初期化",
-      description: "角括弧と波括弧を含む配列宣言です。",
-      input: "int[] scores = {78, 85, 92};\nint first = scores[0];",
-    },
-    {
-      id: "variables-6",
-      context: "long型とfloat型",
-      description: "整数と小数の別の型を宣言します。",
-      input: "long distance = 1200;\nfloat rate = 1.5f;",
-    },
-    {
-      id: "variables-7",
-      context: "文字列変数の連結",
-      description: "複数の文字列変数を一つにまとめます。",
-      input: 'String firstName = "Aki";\nString lastName = "Sato";\nString fullName = firstName + lastName;',
-    },
-    {
-      id: "variables-8",
-      context: "変数の再代入",
-      description: "値のコピーと再代入を続けて入力します。",
-      input: "int x = 10;\nint y = x;\nx = 20;",
-    },
-    {
-      id: "variables-9",
-      context: "定数の宣言",
-      description: "finalを使い、変更しない整数を宣言します。",
-      input: "final int LIMIT = 50;",
-    },
-    {
-      id: "variables-10",
-      context: "複数変数の宣言",
-      description: "同じ型の変数を一行で宣言し、面積を計算します。",
-      input: "int width = 8, height = 5;\nint area = width * height;",
-    },
-    {
-      id: "variables-11",
-      context: "型のキャスト",
-      description: "小数を整数へ明示的に変換します。",
-      input: "double price = 98.7;\nint rounded = (int) price;",
-    },
-    {
-      id: "variables-12",
-      context: "nullの代入と比較",
-      description: "参照型の初期値をnullにして比較します。",
-      input: "String note = null;\nboolean empty = note == null;",
-    },
-  ],
-  condition: [
-    {
-      id: "condition-1",
-      context: "合格判定",
-      description: "比較演算子、if、else、波括弧をまとめて練習します。",
-      input: 'if (score >= 80) {\n    System.out.println("Pass");\n} else {\n    System.out.println("Try again");\n}',
-    },
-    {
-      id: "condition-2",
-      context: "偶数の判定",
-      description: "剰余演算子と等価演算子を使います。",
-      input: 'if (number % 2 == 0) {\n    System.out.println("Even");\n}',
-    },
-    {
-      id: "condition-3",
-      context: "範囲の確認",
-      description: "AND演算子を使い、複数の条件を組み合わせます。",
-      input: 'if (age >= 18 && age < 65) {\n    System.out.println("Adult");\n}',
-    },
-    {
-      id: "condition-4",
-      context: "否定条件",
-      description: "感嘆符を使い、falseのときだけ処理します。",
-      input: 'if (!finished) {\n    System.out.println("Working");\n}',
-    },
-    {
-      id: "condition-5",
-      context: "三段階の判定",
-      description: "else ifを使って条件を順番に評価します。",
-      input: 'if (score >= 90) {\n    grade = "A";\n} else if (score >= 80) {\n    grade = "B";\n} else {\n    grade = "C";\n}',
-    },
-    {
-      id: "condition-6",
-      context: "文字列の一致判定",
-      description: "equalsメソッドを条件式で使用します。",
-      input: 'if (name.equals("Aki")) {\n    System.out.println("Hello");\n}',
-    },
-    {
-      id: "condition-7",
-      context: "三項演算子",
-      description: "条件に応じて文字列を選択します。",
-      input: 'String result = score >= 60 ? "Pass" : "Fail";',
-    },
-    {
-      id: "condition-8",
-      context: "入れ子の条件分岐",
-      description: "if文の中でもう一つの条件を確認します。",
-      input: 'if (loggedIn) {\n    if (admin) {\n        System.out.println("Admin");\n    }\n}',
-    },
-    {
-      id: "condition-9",
-      context: "不一致の判定",
-      description: "等しくないことを比較演算子で確認します。",
-      input: 'if (status != 200) {\n    System.out.println("Error");\n}',
-    },
-    {
-      id: "condition-10",
-      context: "気温による表示の切り替え",
-      description: "ifとelseで二つのメッセージを切り替えます。",
-      input: 'if (temperature < 10) {\n    System.out.println("Cold");\n} else {\n    System.out.println("Warm");\n}',
-    },
-    {
-      id: "condition-11",
-      context: "空でない文字列の確認",
-      description: "文字列の長さを条件式で確認します。",
-      input: 'if (name.length() > 0) {\n    System.out.println(name);\n}',
-    },
-    {
-      id: "condition-12",
-      context: "在庫有無の三項演算",
-      description: "比較結果からboolean値を選択します。",
-      input: "boolean available = stock > 0 ? true : false;",
-    },
-  ],
-  loop: [
-    {
-      id: "loop-1",
-      context: "forループ",
-      description: "初期化、条件、インクリメントを一行で入力します。",
-      input: "for (int i = 0; i < 5; i++) {\n    System.out.println(i);\n}",
-    },
-    {
-      id: "loop-2",
-      context: "拡張forループ",
-      description: "配列、コロン、拡張for文を写経します。",
-      input: 'String[] names = {"Aki", "Haru", "Sora"};\nfor (String name : names) {\n    System.out.println(name);\n}',
-    },
-    {
-      id: "loop-3",
-      context: "whileループ",
-      description: "条件式とインクリメントを別の行に書きます。",
-      input: "int count = 0;\nwhile (count < 3) {\n    count++;\n}",
-    },
-    {
-      id: "loop-4",
-      context: "逆順のforループ",
-      description: "デクリメントを使って数字を減らします。",
-      input: "for (int i = 5; i > 0; i--) {\n    System.out.println(i);\n}",
-    },
-    {
-      id: "loop-5",
-      context: "二重ループ",
-      description: "入れ子になったfor文と掛け算を練習します。",
-      input: "for (int row = 1; row <= 3; row++) {\n    for (int col = 1; col <= 3; col++) {\n        System.out.println(row * col);\n    }\n}",
-    },
-    {
-      id: "loop-6",
-      context: "do-whileループ",
-      description: "処理後に条件を判定するループです。",
-      input: "int count = 3;\ndo {\n    count--;\n} while (count > 0);",
-    },
-    {
-      id: "loop-7",
-      context: "continueによるスキップ",
-      description: "条件に合う回だけ処理を飛ばします。",
-      input: "for (int i = 0; i < 6; i++) {\n    if (i % 2 == 0) {\n        continue;\n    }\n    System.out.println(i);\n}",
-    },
-    {
-      id: "loop-8",
-      context: "breakによる終了",
-      description: "条件に達した時点でループを終了します。",
-      input: "for (int i = 0; i < 10; i++) {\n    if (i == 4) {\n        break;\n    }\n}",
-    },
-    {
-      id: "loop-9",
-      context: "合計値の計算",
-      description: "ループ内で値を足し、合計を更新します。",
-      input: "int sum = 0;\nfor (int i = 1; i <= 5; i++) {\n    sum += i;\n}",
-    },
-    {
-      id: "loop-10",
-      context: "文字列を一文字ずつ表示",
-      description: "文字列の長さを使って繰り返します。",
-      input: "for (int i = 0; i < text.length(); i++) {\n    System.out.println(text.charAt(i));\n}",
-    },
-    {
-      id: "loop-11",
-      context: "whileループからの脱出",
-      description: "条件を満たしたらbreakで処理を終えます。",
-      input: "int value = 1;\nwhile (value < 100) {\n    value *= 2;\n    if (value > 50) {\n        break;\n    }\n}",
-    },
-    {
-      id: "loop-12",
-      context: "配列を添字で走査",
-      description: "配列の長さを使って全要素を表示します。",
-      input: "for (int i = 0; i < scores.length; i++) {\n    System.out.println(scores[i]);\n}",
-    },
-  ],
-  method: [
-    {
-      id: "method-1",
-      context: "値を返すメソッド",
-      description: "引数、戻り値、return文を練習します。",
-      input: "static int add(int a, int b) {\n    return a + b;\n}",
-    },
-    {
-      id: "method-2",
-      context: "voidメソッド",
-      description: "文字列を受け取り、標準出力するメソッドです。",
-      input: "static void greet(String name) {\n    System.out.println(\"Hello, \" + name);\n}",
-    },
-    {
-      id: "method-3",
-      context: "メソッド呼び出し",
-      description: "戻り値を変数へ受け取り、出力します。",
-      input: "int result = add(12, 8);\nSystem.out.println(result);",
-    },
-    {
-      id: "method-4",
-      context: "真偽値を返すメソッド",
-      description: "比較結果をreturn文でそのまま返します。",
-      input: "static boolean isAdult(int age) {\n    return age >= 18;\n}",
-    },
-    {
-      id: "method-5",
-      context: "文字列を返すメソッド",
-      description: "String型の戻り値と文字列連結を練習します。",
-      input: 'static String label(String name) {\n    return "Hello, " + name;\n}',
-    },
-    {
-      id: "method-6",
-      context: "引数なしのメソッド",
-      description: "引数を持たないvoidメソッドを定義します。",
-      input: 'static void showTitle() {\n    System.out.println("Menu");\n}',
-    },
-    {
-      id: "method-7",
-      context: "配列を受け取るメソッド",
-      description: "配列の先頭要素を戻り値にします。",
-      input: "static int first(int[] values) {\n    return values[0];\n}",
-    },
-    {
-      id: "method-8",
-      context: "メソッド呼び出しの入れ子",
-      description: "戻り値を別のメソッド呼び出しへ渡します。",
-      input: "int total = add(add(1, 2), 3);\nSystem.out.println(total);",
-    },
-    {
-      id: "method-9",
-      context: "小数の平均を返すメソッド",
-      description: "double型の引数と戻り値を使います。",
-      input: "static double average(double a, double b) {\n    return (a + b) / 2;\n}",
-    },
-    {
-      id: "method-10",
-      context: "大きい値を返すメソッド",
-      description: "条件分岐と早いreturnを組み合わせます。",
-      input: "static int max(int a, int b) {\n    if (a > b) {\n        return a;\n    }\n    return b;\n}",
-    },
-    {
-      id: "method-11",
-      context: "配列の全要素を表示するメソッド",
-      description: "配列を受け取り、拡張for文で処理します。",
-      input: "static void printAll(String[] values) {\n    for (String value : values) {\n        System.out.println(value);\n    }\n}",
-    },
-    {
-      id: "method-12",
-      context: "文字列の長さを返すメソッド",
-      description: "String型の引数から文字数を取得して返します。",
-      input: "static int lengthOf(String text) {\n    return text.length();\n}",
-    },
-  ],
-};
 
 const KEYBOARD_ROWS = [
   ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", ":"],
@@ -979,7 +198,11 @@ function sortedMistakes(mistakes: Record<string, number>) {
 function Brand({ onClick }: { onClick: () => void }) {
   return (
     <button className="brand" onClick={onClick} aria-label="練習メニューへ">
-      <span>ゆっくりタイピング</span>
+      <span className="brand-name">
+        <b>ゆっくり</b>
+        <strong>タイピング</strong>
+        <i aria-hidden="true" />
+      </span>
       <small>文章やコードを打ちながら、指だけ整える</small>
     </button>
   );
@@ -1157,6 +380,42 @@ function SettingsPanel({
   );
 }
 
+function PracticePreview({
+  exercise,
+  sceneTitle,
+  exerciseCount,
+  onStart,
+  onClose,
+}: {
+  exercise: Exercise;
+  sceneTitle: string;
+  exerciseCount: number;
+  onStart: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="overlay preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+      <section className="practice-preview">
+        <div className="preview-breath" aria-hidden="true">
+          <i />
+          <span>ひと呼吸</span>
+        </div>
+        <p className="eyebrow">{sceneTitle}・全{exerciseCount}文</p>
+        <h2 id="preview-title">最初の文章を確認しましょう</h2>
+        <p className="preview-lead">意味と流れをつかんでから、落ち着いて入力を始めます。</p>
+        <div className="preview-paper">
+          <span>{exercise.context}</span>
+          <blockquote>{exercise.description}</blockquote>
+        </div>
+        <div className="preview-actions">
+          <button className="primary-button" onClick={onStart}>確認したので始める →</button>
+          <button className="text-button" onClick={onClose}>練習メニューへ戻る</button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function Home() {
   const [screen, setScreen] = useState<Screen>("scenes");
   const [scene, setScene] = useState<SceneId>("mail");
@@ -1164,6 +423,7 @@ export default function Home() {
   const [history, setHistory] = useState<SessionRecord[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -1355,8 +615,17 @@ export default function Home() {
     setScreen("practice");
   };
 
+  const requestPracticeStart = () => {
+    if (isJavaScene(scene)) {
+      startPractice();
+      return;
+    }
+    setPreviewOpen(true);
+  };
+
   const goToScenes = () => {
     setPaused(false);
+    setPreviewOpen(false);
     setScreen("scenes");
   };
 
@@ -1381,10 +650,18 @@ export default function Home() {
 
       {screen === "scenes" && (
         <div className="page-shell inner-page">
-          <div className="page-title">
-            <p className="eyebrow">練習メニュー</p>
-            <h1>練習を選ぶ</h1>
-          </div>
+          <section className="calm-hero" aria-labelledby="calm-hero-title">
+            <div className="calm-hero-copy">
+              <p className="eyebrow">急がなくていい、指の動きを確かめよう</p>
+              <h1 id="calm-hero-title">一文字ずつ、<span>ゆっくり。</span></h1>
+              <p>速さではなく、文章の意味と正しい指づかいをそろえる練習です。肩の力を抜いて、今日の一題を選んでください。</p>
+            </div>
+            <div className="slow-rhythm" aria-hidden="true">
+              <div className="rhythm-key"><span>F</span><small>左手</small></div>
+              <div className="rhythm-breath"><i /><i /><i /><b>すう</b><em>はく</em></div>
+              <div className="rhythm-key"><span>J</span><small>右手</small></div>
+            </div>
+          </section>
 
           <section className="scene-start-bar" aria-label="選択中の練習">
             <div>
@@ -1395,8 +672,8 @@ export default function Home() {
               </small>
             </div>
             <div className="scene-start-actions">
-              <button className="primary-button" onClick={startPractice}>
-                {SCENES[scene].title}を始める →
+              <button className="primary-button" onClick={requestPracticeStart}>
+                {isJavaScene(scene) ? `${SCENES[scene].title}を始める →` : "文章を確認して始める →"}
               </button>
               <button onClick={() => setSettingsOpen(true)}>練習量を変更</button>
             </div>
@@ -1638,7 +915,7 @@ export default function Home() {
           </section>
 
           <div className="result-actions">
-            <button className="primary-button" onClick={startPractice}>{isJavaScene(scene) ? "同じ構文をもう一度" : "同じ文章をもう一度"}</button>
+            <button className="primary-button" onClick={requestPracticeStart}>{isJavaScene(scene) ? "同じ構文をもう一度" : "同じ文章をもう一度"}</button>
             <button className="secondary-button" onClick={() => setScreen("scenes")}>別の練習を選ぶ</button>
             <button className="text-button" onClick={goToScenes}>練習メニューへ</button>
           </div>
@@ -1652,6 +929,19 @@ export default function Home() {
           maxExerciseCount={availableExerciseCount}
           onChange={setSettings}
           onClose={() => setSettingsOpen(false)}
+        />
+      )}
+
+      {previewOpen && !isJavaScene(scene) && exercises[0] && (
+        <PracticePreview
+          exercise={exercises[0]}
+          sceneTitle={SCENES[scene].title}
+          exerciseCount={exercises.length}
+          onStart={() => {
+            setPreviewOpen(false);
+            startPractice();
+          }}
+          onClose={() => setPreviewOpen(false)}
         />
       )}
 
