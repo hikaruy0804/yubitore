@@ -195,6 +195,26 @@ function sortedMistakes(mistakes: Record<string, number>) {
   return Object.entries(mistakes).sort((a, b) => b[1] - a[1]);
 }
 
+function shuffleExercises(exercises: Exercise[], previousFirstId?: string) {
+  const shuffled = [...exercises];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  if (shuffled.length > 1 && shuffled[0].id === previousFirstId) {
+    [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
+  }
+  return shuffled;
+}
+
+function sentenceProgressIndex(exercise: Exercise, inputIndex: number) {
+  if (!exercise.description.length || !exercise.input.length) return 0;
+  return Math.min(
+    exercise.description.length - 1,
+    Math.floor((inputIndex / exercise.input.length) * exercise.description.length),
+  );
+}
+
 function Brand({ onClick }: { onClick: () => void }) {
   return (
     <button className="brand" onClick={onClick} aria-label="練習メニューへ">
@@ -384,27 +404,30 @@ function PracticePreview({
   exercise,
   sceneTitle,
   exerciseCount,
+  exerciseNumber,
   onStart,
   onClose,
 }: {
   exercise: Exercise;
   sceneTitle: string;
   exerciseCount: number;
+  exerciseNumber: number;
   onStart: () => void;
   onClose: () => void;
 }) {
+  const isFirstExercise = exerciseNumber === 1;
   return (
     <div className="overlay preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
       <section className="practice-preview">
-        <p className="eyebrow">{sceneTitle}・全{exerciseCount}文</p>
-        <h2 id="preview-title">最初の文章を確認しましょう</h2>
+        <p className="eyebrow">{sceneTitle}・{exerciseNumber} / {exerciseCount}文</p>
+        <h2 id="preview-title">{isFirstExercise ? "最初の文章" : "次の文章"}を確認しましょう</h2>
         <p className="preview-lead">意味と流れをつかんでから、落ち着いて入力を始めます。</p>
         <div className="preview-paper">
           <span>{exercise.context}</span>
           <blockquote>{exercise.description}</blockquote>
         </div>
         <div className="preview-actions">
-          <button className="primary-button" onClick={onStart}>確認したので始める →</button>
+          <button className="primary-button" onClick={onStart}>{isFirstExercise ? "確認したので始める" : "この文章を入力する"} →</button>
           <button className="text-button" onClick={onClose}>練習メニューへ戻る</button>
         </div>
       </section>
@@ -419,9 +442,11 @@ export default function Home() {
   const [history, setHistory] = useState<SessionRecord[]>([]);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewExerciseIndex, setPreviewExerciseIndex] = useState<number | null>(null);
+  const [sessionExercises, setSessionExercises] = useState<Exercise[]>([]);
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
+  const [strokePulse, setStrokePulse] = useState(0);
   const [correct, setCorrect] = useState(0);
   const [mistakes, setMistakes] = useState<Record<string, number>>({});
   const [targetFingerErrors, setTargetFingerErrors] = useState<Record<string, number>>({});
@@ -452,9 +477,11 @@ export default function Home() {
 
   const availableExerciseCount = EXERCISES[scene].length;
   const selectedExerciseCount = Math.min(settings.exerciseCount, availableExerciseCount);
-  const exercises = useMemo<Exercise[]>(() => {
+  const configuredExercises = useMemo<Exercise[]>(() => {
     return EXERCISES[scene].slice(0, selectedExerciseCount);
   }, [scene, selectedExerciseCount]);
+  const usesSessionExercises = screen !== "scenes" || previewExerciseIndex !== null;
+  const exercises = usesSessionExercises && sessionExercises.length ? sessionExercises : configuredExercises;
 
   const exercise = exercises[exerciseIndex] || exercises[0];
   const target = exercise?.input[charIndex] || "";
@@ -462,6 +489,7 @@ export default function Home() {
   const fingerNameParts = targetInfo.label.split("の");
   const activeHandLabel = targetInfo.hand === "thumb" ? "左右の手" : fingerNameParts[0];
   const activeFingerLabel = targetInfo.hand === "thumb" ? "親指" : fingerNameParts[1];
+  const sentenceIndex = exercise ? sentenceProgressIndex(exercise, charIndex) : 0;
   const totalLength = useMemo(() => exercises.reduce((sum, item) => sum + item.input.length, 0), [exercises]);
   const completedLength = useMemo(
     () => exercises.slice(0, exerciseIndex).reduce((sum, item) => sum + item.input.length, 0) + charIndex,
@@ -527,17 +555,22 @@ export default function Home() {
         return;
       }
       if (exerciseIndex + 1 < exercises.length) {
+        if (!isJavaScene(scene)) {
+          setPreviewExerciseIndex(exerciseIndex + 1);
+          return;
+        }
         setExerciseIndex((value) => value + 1);
         setCharIndex(0);
+        setStrokePulse(0);
         return;
       }
       finishSession(nextCorrect, nextMistakes, nextFingerErrors);
     },
-    [charIndex, exercise.input.length, exerciseIndex, exercises.length, finishSession],
+    [charIndex, exercise.input.length, exerciseIndex, exercises.length, finishSession, scene],
   );
 
   useEffect(() => {
-    if (screen !== "practice" || paused || settingsOpen || historyOpen) return;
+    if (screen !== "practice" || paused || settingsOpen || historyOpen || previewExerciseIndex !== null) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.repeat || event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.key === "Escape") {
@@ -559,6 +592,7 @@ export default function Home() {
         const nextCorrect = correct + 1;
         setCorrect(nextCorrect);
         setWrongKey(null);
+        setStrokePulse((value) => value + 1);
         playTone(true);
         advance(nextCorrect, mistakes, targetFingerErrors);
         return;
@@ -585,6 +619,7 @@ export default function Home() {
     mistakes,
     paused,
     playTone,
+    previewExerciseIndex,
     screen,
     settingsOpen,
     target,
@@ -602,26 +637,43 @@ export default function Home() {
   const startPractice = () => {
     setExerciseIndex(0);
     setCharIndex(0);
+    setStrokePulse(0);
     setCorrect(0);
     setMistakes({});
     setTargetFingerErrors({});
     setWrongKey(null);
     setPaused(false);
     setResult(null);
+    setPreviewExerciseIndex(null);
     setScreen("practice");
   };
 
   const requestPracticeStart = () => {
+    const shuffled = shuffleExercises(EXERCISES[scene], sessionExercises[0]?.id).slice(0, selectedExerciseCount);
+    setSessionExercises(shuffled);
     if (isJavaScene(scene)) {
       startPractice();
       return;
     }
-    setPreviewOpen(true);
+    setPreviewExerciseIndex(0);
+  };
+
+  const confirmPreview = () => {
+    if (previewExerciseIndex === null) return;
+    if (screen === "practice") {
+      setExerciseIndex(previewExerciseIndex);
+      setCharIndex(0);
+      setStrokePulse(0);
+      setWrongKey(null);
+      setPreviewExerciseIndex(null);
+      return;
+    }
+    startPractice();
   };
 
   const goToScenes = () => {
     setPaused(false);
-    setPreviewOpen(false);
+    setPreviewExerciseIndex(null);
     setScreen("scenes");
   };
 
@@ -786,7 +838,7 @@ export default function Home() {
               </header>
 
               <div className="source-code">
-                <span className="section-label">{isJavaScene(scene) ? "写経するコード" : "入力する文"}</span>
+                <span className="section-label">{isJavaScene(scene) ? "写経するコード" : "文章の入力状況"}</span>
                 {isJavaScene(scene) ? (
                   <>
                     <p>{exercise.description}</p>
@@ -797,6 +849,7 @@ export default function Home() {
                           key={`${char}-${index}`}
                         >
                           {char === "\n" ? (index === charIndex ? "↵\n" : "\n") : char}
+                          {index === charIndex && strokePulse > 0 && <i className="stroke-wave" key={strokePulse} aria-hidden="true" />}
                         </span>
                       ))}
                     </pre>
@@ -804,7 +857,17 @@ export default function Home() {
                 ) : (
                   <>
                     <p>{exercise.context}</p>
-                    <strong>{exercise.description}</strong>
+                    <div className="sentence-progress" aria-label={`文章の入力状況 ${exercise.description}`}>
+                      {exercise.description.split("").map((char, index) => (
+                        <span
+                          className={`${index < sentenceIndex ? "done" : ""} ${index === sentenceIndex ? "current" : ""}`}
+                          key={`${char}-${index}`}
+                        >
+                          {char}
+                          {index === sentenceIndex && strokePulse > 0 && <i className="stroke-wave" key={strokePulse} aria-hidden="true" />}
+                        </span>
+                      ))}
+                    </div>
                   </>
                 )}
               </div>
@@ -820,24 +883,9 @@ export default function Home() {
 
               <div className="input-tracker">
                 <div className="roman-label">
-                  <span>{isJavaScene(scene) ? "入力位置" : "ローマ字の入力状況"}</span>
-                  <small>{charIndex} / {exercise.input.length}文字</small>
+                  <span>{isJavaScene(scene) ? "入力位置" : "入力するローマ字"}</span>
+                  <small>次の1文字を強調</small>
                 </div>
-                {!isJavaScene(scene) && (
-                  <div
-                    className={`typed-romaji ${wrongKey ? "has-error" : ""}`}
-                    role="status"
-                    aria-live="polite"
-                    aria-label={`入力済みのローマ字 ${exercise.input.slice(0, charIndex) || "なし"}`}
-                  >
-                    <span>
-                      {charIndex > 30 && <small aria-hidden="true">…</small>}
-                      {exercise.input.slice(Math.max(0, charIndex - 30), charIndex) || <em>入力した文字がここに表示されます</em>}
-                    </span>
-                    <i aria-hidden="true" />
-                    {wrongKey && <b>× {displayKey(wrongKey)}</b>}
-                  </div>
-                )}
                 <div
                   className="roman-line code-input"
                   aria-label={`${isJavaScene(scene) ? "入力するJavaコード" : "入力するローマ字"} ${exercise.input}`}
@@ -935,16 +983,14 @@ export default function Home() {
         />
       )}
 
-      {previewOpen && !isJavaScene(scene) && exercises[0] && (
+      {previewExerciseIndex !== null && !isJavaScene(scene) && exercises[previewExerciseIndex] && (
         <PracticePreview
-          exercise={exercises[0]}
+          exercise={exercises[previewExerciseIndex]}
           sceneTitle={SCENES[scene].title}
           exerciseCount={exercises.length}
-          onStart={() => {
-            setPreviewOpen(false);
-            startPractice();
-          }}
-          onClose={() => setPreviewOpen(false)}
+          exerciseNumber={previewExerciseIndex + 1}
+          onStart={confirmPreview}
+          onClose={screen === "practice" ? goToScenes : () => setPreviewExerciseIndex(null)}
         />
       )}
 
