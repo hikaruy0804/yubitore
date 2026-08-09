@@ -207,11 +207,11 @@ function shuffleExercises(exercises: Exercise[], previousFirstId?: string) {
   return shuffled;
 }
 
-function sentenceProgressIndex(exercise: Exercise, inputIndex: number) {
+function sentenceRevealLength(exercise: Exercise, inputIndex: number) {
   if (!exercise.description.length || !exercise.input.length) return 0;
   return Math.min(
-    exercise.description.length - 1,
-    Math.floor((inputIndex / exercise.input.length) * exercise.description.length),
+    exercise.description.length,
+    Math.ceil((inputIndex / exercise.input.length) * exercise.description.length),
   );
 }
 
@@ -421,7 +421,6 @@ function PracticePreview({
       <section className="practice-preview">
         <p className="eyebrow">{sceneTitle}・{exerciseNumber} / {exerciseCount}文</p>
         <h2 id="preview-title">{isFirstExercise ? "最初の文章" : "次の文章"}を確認しましょう</h2>
-        <p className="preview-lead">意味と流れをつかんでから、落ち着いて入力を始めます。</p>
         <div className="preview-paper">
           <span>{exercise.context}</span>
           <blockquote>{exercise.description}</blockquote>
@@ -489,7 +488,7 @@ export default function Home() {
   const fingerNameParts = targetInfo.label.split("の");
   const activeHandLabel = targetInfo.hand === "thumb" ? "左右の手" : fingerNameParts[0];
   const activeFingerLabel = targetInfo.hand === "thumb" ? "親指" : fingerNameParts[1];
-  const sentenceIndex = exercise ? sentenceProgressIndex(exercise, charIndex) : 0;
+  const revealedSentenceLength = exercise ? sentenceRevealLength(exercise, charIndex) : 0;
   const totalLength = useMemo(() => exercises.reduce((sum, item) => sum + item.input.length, 0), [exercises]);
   const completedLength = useMemo(
     () => exercises.slice(0, exerciseIndex).reduce((sum, item) => sum + item.input.length, 0) + charIndex,
@@ -556,6 +555,7 @@ export default function Home() {
       }
       if (exerciseIndex + 1 < exercises.length) {
         if (!isJavaScene(scene)) {
+          setCharIndex(exercise.input.length);
           setPreviewExerciseIndex(exerciseIndex + 1);
           return;
         }
@@ -857,16 +857,21 @@ export default function Home() {
                 ) : (
                   <>
                     <p>{exercise.context}</p>
-                    <div className="sentence-progress" aria-label={`文章の入力状況 ${exercise.description}`}>
-                      {exercise.description.split("").map((char, index) => (
-                        <span
-                          className={`${index < sentenceIndex ? "done" : ""} ${index === sentenceIndex ? "current" : ""}`}
-                          key={`${char}-${index}`}
-                        >
-                          {char}
-                          {index === sentenceIndex && strokePulse > 0 && <i className="stroke-wave" key={strokePulse} aria-hidden="true" />}
-                        </span>
+                    <div
+                      className="sentence-progress"
+                      role="status"
+                      aria-live="polite"
+                      aria-label={`入力した文章 ${exercise.description.slice(0, revealedSentenceLength) || "まだありません"}`}
+                    >
+                      {exercise.description.slice(0, revealedSentenceLength).split("").map((char, index) => (
+                        <span className="revealed" key={`${char}-${index}`}>{char}</span>
                       ))}
+                      {revealedSentenceLength < exercise.description.length && (
+                        <span className="current" aria-hidden="true">
+                          {"\u00a0"}
+                          {strokePulse > 0 && <i className="stroke-wave" key={strokePulse} />}
+                        </span>
+                      )}
                     </div>
                   </>
                 )}
