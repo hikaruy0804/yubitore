@@ -142,7 +142,14 @@ h1, h2, .brand-name, .result-stats strong {
   color: #fffaf0;
   transition: background 150ms ease, transform 150ms ease;
 }
-.primary-button:hover { background: var(--green-dark); transform: translateY(-2px); }
+.primary-button:not(:disabled):hover { background: var(--green-dark); transform: translateY(-2px); }
+.primary-button:disabled {
+  border-color: var(--line-dark);
+  background: var(--sage);
+  color: var(--soft);
+  cursor: not-allowed;
+  opacity: .82;
+}
 .secondary-button { border: 1px solid var(--green); background: transparent; }
 .secondary-button:hover { background: var(--sage); }
 .section-label { color: var(--soft); font-size: .75rem; font-weight: 800; letter-spacing: .1em; }
@@ -376,7 +383,7 @@ h1, h2, .brand-name, .result-stats strong {
 }
 .sentence-progress > span.revealed {
   color: var(--ink);
-  animation: sentence-appear 420ms cubic-bezier(.2,.8,.2,1) both;
+  animation: sentence-appear 960ms cubic-bezier(.16,.72,.2,1) both;
 }
 .sentence-progress > span.current {
   width: .65em;
@@ -392,7 +399,7 @@ h1, h2, .brand-name, .result-stats strong {
   pointer-events: none;
   content: "";
   inset: 50% auto auto 50%;
-  animation: gentle-stroke 720ms cubic-bezier(.16,.7,.2,1) both;
+  animation: gentle-stroke 1100ms cubic-bezier(.16,.7,.2,1) both;
 }
 
 .up-next { margin-top: 24px; border-top: 1px dotted var(--line-dark); padding-top: 18px; }
@@ -845,6 +852,57 @@ h1, h2, .brand-name, .result-stats strong {
 }
 .preview-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 30px; }
 .preview-actions .primary-button { width: min(100%,390px); }
+.preview-wait {
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 4px;
+  color: var(--soft);
+  text-align: left;
+}
+.preview-wait p { display: flex; flex-direction: column; gap: 3px; margin: 0; }
+.preview-wait strong { color: var(--green); font-size: .92rem; letter-spacing: .04em; }
+.preview-wait small { font-size: .72rem; }
+.preview-clock {
+  position: relative;
+  display: block;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  border: 2px solid var(--line-dark);
+  border-radius: 50%;
+  background: rgba(255,252,247,.8);
+  transition: border-color 300ms ease,background 300ms ease;
+}
+.preview-clock::before {
+  position: absolute;
+  top: 7px;
+  left: 50%;
+  width: 2px;
+  height: 16px;
+  border-radius: 99px;
+  background: var(--terra);
+  content: "";
+  transform: translateX(-50%) rotate(0deg);
+  transform-origin: 50% 16px;
+}
+.preview-clock::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--terra);
+  content: "";
+  transform: translate(-50%,-50%);
+}
+.preview-wait.waiting .preview-clock::before { animation: preview-clock-turn 10s linear both; }
+.preview-wait.ready .preview-clock { border-color: var(--sage-dark); background: var(--sage); }
+.preview-wait.ready .preview-clock::before { opacity: 0; }
+.preview-wait.ready .preview-clock::after { width: 10px; height: 10px; background: var(--sage-dark); }
 .modal-heading { display: flex; align-items: start; justify-content: space-between; margin-bottom: 28px; }
 .modal-heading h2 { margin: 0; font-size: 2rem; }
 .modal-heading > button { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: transparent; font-size: 1.35rem; }
@@ -937,8 +995,14 @@ h1, h2, .brand-name, .result-stats strong {
 }
 
 @keyframes sentence-appear {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+  0% { opacity: 0; color: var(--terra); transform: translateY(7px) scale(.96); }
+  55% { opacity: .92; color: var(--sage-dark); transform: translateY(1px) scale(1); }
+  100% { opacity: 1; color: var(--ink); transform: translateY(0) scale(1); }
+}
+
+@keyframes preview-clock-turn {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
 }
 
 @keyframes preview-arrive {
@@ -952,8 +1016,8 @@ h1, h2, .brand-name, .result-stats strong {
 }
 
 @keyframes gentle-stroke {
-  0% { width: 4px; height: 4px; opacity: .8; transform: translate(-50%,-50%) scale(.6); }
-  100% { width: 54px; height: 54px; opacity: 0; transform: translate(-50%,-50%) scale(1); }
+  0% { width: 6px; height: 6px; opacity: .5; transform: translate(-50%,-50%) scale(.7); }
+  100% { width: 68px; height: 68px; opacity: 0; transform: translate(-50%,-50%) scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {

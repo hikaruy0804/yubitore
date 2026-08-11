@@ -50,6 +50,18 @@ async function readStringProperties(category) {
   return entries;
 }
 
+async function importTypeScriptModule(relativePath) {
+  const file = new URL(relativePath, import.meta.url);
+  const source = await readFile(file, "utf8");
+  const output = ts.transpileModule(source, {
+    compilerOptions: {
+      module: ts.ModuleKind.ESNext,
+      target: ts.ScriptTarget.ES2022,
+    },
+  }).outputText;
+  return import(`data:text/javascript;base64,${Buffer.from(output).toString("base64")}`);
+}
+
 test("category exercise files have unique IDs and supported input", async () => {
   const allIds = [];
 
@@ -64,4 +76,27 @@ test("category exercise files have unique IDs and supported input", async () => 
   }
 
   assert.equal(new Set(allIds).size, allIds.length, "exercise IDs must be unique");
+});
+
+test("practical inputs convert to hiragana as typing progresses", async () => {
+  const { romanToHiragana } = await importTypeScriptModule("../app/lib/roman-to-hiragana.ts");
+  assert.equal(romanToHiragana("osew"), "おせ");
+  assert.equal(romanToHiragana("osewa"), "おせわ");
+  assert.equal(romanToHiragana("osewaninatteorimasu.", true), "おせわになっております。");
+  assert.equal(
+    romanToHiragana("nennotame,mitsumorishowosaisouitashimasu.", true),
+    "ねんのため、みつもりしょをさいそういたします。",
+  );
+  assert.equal(
+    romanToHiragana("kaigiganagabiiteirutame,juppunhodookuremasu.", true),
+    "かいぎがながびいているため、じゅっぷんほどおくれます。",
+  );
+
+  for (const category of ["mail", "meeting", "chat", "document"]) {
+    const exercises = await readStringProperties(category);
+    for (const exercise of exercises) {
+      const converted = romanToHiragana(exercise.input, true);
+      assert.match(converted, /^[\u3040-\u309f、。！？ー　\n]+$/, `${exercise.id} hiragana output`);
+    }
+  }
 });

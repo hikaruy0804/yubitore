@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EXERCISES, type Exercise, type SceneId } from "./data/exercises";
+import { romanToHiragana } from "./lib/roman-to-hiragana";
 
 type Hand = "left" | "right" | "thumb";
 type Finger = "pinky" | "ring" | "middle" | "index" | "thumb";
@@ -39,6 +40,7 @@ type Settings = {
 
 const HISTORY_KEY = "yubitore-history-v2";
 const SETTINGS_KEY = "yubitore-settings-v2";
+const PREVIEW_WAIT_SECONDS = 10;
 
 const DEFAULT_SETTINGS: Settings = {
   sound: false,
@@ -205,14 +207,6 @@ function shuffleExercises(exercises: Exercise[], previousFirstId?: string) {
     [shuffled[0], shuffled[1]] = [shuffled[1], shuffled[0]];
   }
   return shuffled;
-}
-
-function sentenceRevealLength(exercise: Exercise, inputIndex: number) {
-  if (!exercise.description.length || !exercise.input.length) return 0;
-  return Math.min(
-    exercise.description.length,
-    Math.ceil((inputIndex / exercise.input.length) * exercise.description.length),
-  );
 }
 
 function Brand({ onClick }: { onClick: () => void }) {
@@ -416,6 +410,19 @@ function PracticePreview({
   onClose: () => void;
 }) {
   const isFirstExercise = exerciseNumber === 1;
+  const [remainingSeconds, setRemainingSeconds] = useState(PREVIEW_WAIT_SECONDS);
+  const canStart = remainingSeconds === 0;
+
+  useEffect(() => {
+    const deadline = Date.now() + PREVIEW_WAIT_SECONDS * 1000;
+    const timer = window.setInterval(() => {
+      const nextSeconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+      setRemainingSeconds(nextSeconds);
+      if (nextSeconds === 0) window.clearInterval(timer);
+    }, 200);
+    return () => window.clearInterval(timer);
+  }, []);
+
   return (
     <div className="overlay preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
       <section className="practice-preview">
@@ -426,7 +433,16 @@ function PracticePreview({
           <blockquote>{exercise.description}</blockquote>
         </div>
         <div className="preview-actions">
-          <button className="primary-button" onClick={onStart}>{isFirstExercise ? "確認したので始める" : "この文章を入力する"} →</button>
+          <div className={`preview-wait ${canStart ? "ready" : "waiting"}`} id="preview-wait-status" role="status" aria-live="polite">
+            <span className="preview-clock" aria-hidden="true" />
+            <p>
+              <strong>{canStart ? "準備ができました" : `あと${remainingSeconds}秒`}</strong>
+              <small>{canStart ? "落ち着いたら入力を始められます" : "文章を読みながらお待ちください"}</small>
+            </p>
+          </div>
+          <button className="primary-button" onClick={onStart} disabled={!canStart} aria-describedby="preview-wait-status">
+            {canStart ? `${isFirstExercise ? "確認したので始める" : "この文章を入力する"} →` : `あと${remainingSeconds}秒で始められます`}
+          </button>
           <button className="text-button" onClick={onClose}>練習メニューへ戻る</button>
         </div>
       </section>
@@ -488,7 +504,9 @@ export default function Home() {
   const fingerNameParts = targetInfo.label.split("の");
   const activeHandLabel = targetInfo.hand === "thumb" ? "左右の手" : fingerNameParts[0];
   const activeFingerLabel = targetInfo.hand === "thumb" ? "親指" : fingerNameParts[1];
-  const revealedSentenceLength = exercise ? sentenceRevealLength(exercise, charIndex) : 0;
+  const typedSentence = exercise && !isJavaScene(scene)
+    ? romanToHiragana(exercise.input.slice(0, charIndex), charIndex >= exercise.input.length)
+    : "";
   const totalLength = useMemo(() => exercises.reduce((sum, item) => sum + item.input.length, 0), [exercises]);
   const completedLength = useMemo(
     () => exercises.slice(0, exerciseIndex).reduce((sum, item) => sum + item.input.length, 0) + charIndex,
@@ -861,12 +879,12 @@ export default function Home() {
                       className="sentence-progress"
                       role="status"
                       aria-live="polite"
-                      aria-label={`入力した文章 ${exercise.description.slice(0, revealedSentenceLength) || "まだありません"}`}
+                      aria-label={`入力した文章 ${typedSentence || "まだありません"}`}
                     >
-                      {exercise.description.slice(0, revealedSentenceLength).split("").map((char, index) => (
+                      {typedSentence.split("").map((char, index) => (
                         <span className="revealed" key={`${char}-${index}`}>{char}</span>
                       ))}
-                      {revealedSentenceLength < exercise.description.length && (
+                      {charIndex < exercise.input.length && (
                         <span className="current" aria-hidden="true">
                           {"\u00a0"}
                           {strokePulse > 0 && <i className="stroke-wave" key={strokePulse} />}
@@ -990,6 +1008,7 @@ export default function Home() {
 
       {previewExerciseIndex !== null && !isJavaScene(scene) && exercises[previewExerciseIndex] && (
         <PracticePreview
+          key={exercises[previewExerciseIndex].id}
           exercise={exercises[previewExerciseIndex]}
           sceneTitle={SCENES[scene].title}
           exerciseCount={exercises.length}
