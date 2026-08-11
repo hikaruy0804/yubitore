@@ -352,14 +352,15 @@ h1, h2, .brand-name, .result-stats strong {
   word-break: break-word;
 }
 .roman-line > span {
+  position: relative;
   display: inline;
   min-width: .58em;
   border-bottom: 2px solid transparent;
   text-align: center;
-  transition: color 100ms ease, background 100ms ease;
+  transition: color 280ms ease, background 280ms ease, border-color 280ms ease;
 }
 .roman-line > span.done { color: var(--sage-dark); }
-.practice-mode .roman-line > span.done { animation: roman-settle 900ms cubic-bezier(.22,.61,.36,1) both; }
+.practice-mode .roman-line > span.done { animation: roman-settle 1100ms cubic-bezier(.22,.61,.36,1) both; }
 .roman-line > span.current {
   border-bottom-color: var(--terra);
   background: var(--terra-soft);
@@ -380,17 +381,29 @@ h1, h2, .brand-name, .result-stats strong {
   position: relative;
   display: inline-block;
   border-radius: 3px;
-  transition: color 260ms ease,background 260ms ease,opacity 260ms ease;
+  isolation: isolate;
+  transition: color 420ms ease,background 420ms ease,opacity 420ms ease;
 }
 .sentence-progress > span.revealed {
   color: var(--ink);
-  animation: sentence-appear 1350ms cubic-bezier(.22,.61,.36,1) both;
+}
+.sentence-progress > span.latest {
+  animation: sentence-appear 1800ms cubic-bezier(.16,.72,.28,1) both;
+}
+.sentence-progress > span.latest::after {
+  position: absolute;
+  z-index: -1;
+  inset: -.08em -.16em;
+  border-radius: 45% 55% 50% 48%;
+  background: radial-gradient(ellipse at center, rgba(216,226,216,.72) 0%, rgba(216,226,216,.34) 48%, transparent 74%);
+  content: "";
+  animation: ink-afterglow 2200ms cubic-bezier(.2,.7,.2,1) both;
 }
 .sentence-progress > span.current {
   width: .65em;
   color: transparent;
   box-shadow: inset 2px 0 0 var(--terra);
-  animation: slow-caret 2.4s ease-in-out infinite;
+  animation: caret-arrive 700ms ease-out both, slow-caret 3.2s 700ms ease-in-out infinite;
 }
 .stroke-wave {
   position: absolute;
@@ -871,6 +884,15 @@ h1, h2, .brand-name, .result-stats strong {
 }
 .preview-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 30px; }
 .preview-actions .primary-button { width: min(100%,390px); }
+.preview-actions .primary-button:disabled {
+  border-color: rgba(41,73,63,.12);
+  background: rgba(41,73,63,.12);
+  box-shadow: none;
+  color: rgba(41,73,63,.46);
+  cursor: default;
+  transform: none;
+}
+.preview-actions .primary-button.is-ready { animation: start-ready 900ms cubic-bezier(.22,.61,.36,1) both; }
 .modal-heading { display: flex; align-items: start; justify-content: space-between; margin-bottom: 28px; }
 .modal-heading h2 { margin: 0; font-size: 2rem; }
 .modal-heading > button { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; background: transparent; font-size: 1.35rem; }
@@ -963,14 +985,32 @@ h1, h2, .brand-name, .result-stats strong {
 }
 
 @keyframes sentence-appear {
-  0% { opacity: 0; color: var(--sage-dark); filter: blur(2px); transform: translateY(4px); }
-  62% { opacity: .88; color: var(--sage-dark); filter: blur(.4px); transform: translateY(1px); }
+  0% { opacity: 0; color: var(--sage-dark); filter: blur(2.2px); transform: translateY(5px); }
+  38% { opacity: .68; color: var(--sage-dark); filter: blur(1px); transform: translateY(2px); }
+  74% { opacity: .94; color: var(--ink); filter: blur(.25px); transform: translateY(.5px); }
   100% { opacity: 1; color: var(--ink); filter: blur(0); transform: translateY(0); }
 }
 
 @keyframes roman-settle {
-  0% { opacity: .42; color: var(--terra); transform: translateY(2px); }
-  100% { opacity: 1; color: var(--sage-dark); transform: translateY(0); }
+  0% { opacity: .58; color: var(--terra); background: var(--terra-soft); }
+  55% { opacity: .9; color: var(--sage-dark); background: rgba(216,226,216,.44); }
+  100% { opacity: 1; color: var(--sage-dark); background: transparent; }
+}
+
+@keyframes caret-arrive {
+  from { opacity: .2; box-shadow: inset 0 0 0 var(--terra); }
+  to { opacity: .95; box-shadow: inset 2px 0 0 var(--terra); }
+}
+
+@keyframes ink-afterglow {
+  0% { opacity: 0; transform: scaleX(.35) scaleY(.72); }
+  32% { opacity: .78; transform: scaleX(.92) scaleY(1); }
+  100% { opacity: 0; transform: scaleX(1.18) scaleY(1.08); }
+}
+
+@keyframes start-ready {
+  0% { opacity: .55; filter: saturate(.5); }
+  100% { opacity: 1; filter: saturate(1); }
 }
 
 @keyframes preview-arrive {

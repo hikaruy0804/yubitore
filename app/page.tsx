@@ -40,6 +40,7 @@ type Settings = {
 
 const HISTORY_KEY = "yubitore-history-v2";
 const SETTINGS_KEY = "yubitore-settings-v2";
+const PREVIEW_READING_DELAY_MS = 10_000;
 
 const DEFAULT_SETTINGS: Settings = {
   sound: false,
@@ -409,6 +410,12 @@ function PracticePreview({
   onClose: () => void;
 }) {
   const isFirstExercise = exerciseNumber === 1;
+  const [canStart, setCanStart] = useState(false);
+
+  useEffect(() => {
+    const readingDelay = window.setTimeout(() => setCanStart(true), PREVIEW_READING_DELAY_MS);
+    return () => window.clearTimeout(readingDelay);
+  }, [exercise.id]);
 
   return (
     <div className="overlay preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
@@ -420,7 +427,11 @@ function PracticePreview({
           <blockquote>{exercise.description}</blockquote>
         </div>
         <div className="preview-actions">
-          <button className="primary-button" onClick={onStart}>
+          <button
+            className={`primary-button ${canStart ? "is-ready" : ""}`}
+            disabled={!canStart}
+            onClick={onStart}
+          >
             {isFirstExercise ? "入力を始める →" : "この文章を入力する →"}
           </button>
           <button className="text-button" onClick={onClose}>練習メニューへ戻る</button>
@@ -862,12 +873,16 @@ export default function Home() {
                       aria-label={`入力した文章 ${typedSentence || "まだありません"}`}
                     >
                       {typedSentence.split("").map((char, index) => (
-                        <span className="revealed" key={`${char}-${index}`}>{char}</span>
+                        <span
+                          className={`revealed ${index === typedSentence.length - 1 ? "latest" : ""}`}
+                          key={`${char}-${index}`}
+                        >
+                          {char}
+                        </span>
                       ))}
                       {charIndex < exercise.input.length && (
-                        <span className="current" aria-hidden="true">
+                        <span className="current" key={`current-${charIndex}`} aria-hidden="true">
                           {"\u00a0"}
-                          {strokePulse > 0 && <i className="stroke-wave" key={strokePulse} />}
                         </span>
                       )}
                     </div>
