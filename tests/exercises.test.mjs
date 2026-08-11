@@ -100,3 +100,15 @@ test("practical inputs convert to hiragana as typing progresses", async () => {
     }
   }
 });
+
+test("practical preview has no countdown and keeps the original Japanese visible", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /PREVIEW_WAIT_SECONDS|remainingSeconds|あと.*秒/);
+  assert.doesNotMatch(css, /preview-clock|preview-wait/);
+  assert.match(page, /className="japanese-reference"/);
+  assert.match(page, /<p>\{exercise\.description\}<\/p>/);
+  assert.match(css, /@keyframes roman-settle/);
+  assert.match(css, /@keyframes sentence-appear/);
+});

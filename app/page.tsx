@@ -40,7 +40,6 @@ type Settings = {
 
 const HISTORY_KEY = "yubitore-history-v2";
 const SETTINGS_KEY = "yubitore-settings-v2";
-const PREVIEW_WAIT_SECONDS = 10;
 
 const DEFAULT_SETTINGS: Settings = {
   sound: false,
@@ -410,38 +409,19 @@ function PracticePreview({
   onClose: () => void;
 }) {
   const isFirstExercise = exerciseNumber === 1;
-  const [remainingSeconds, setRemainingSeconds] = useState(PREVIEW_WAIT_SECONDS);
-  const canStart = remainingSeconds === 0;
-
-  useEffect(() => {
-    const deadline = Date.now() + PREVIEW_WAIT_SECONDS * 1000;
-    const timer = window.setInterval(() => {
-      const nextSeconds = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
-      setRemainingSeconds(nextSeconds);
-      if (nextSeconds === 0) window.clearInterval(timer);
-    }, 200);
-    return () => window.clearInterval(timer);
-  }, []);
 
   return (
     <div className="overlay preview-overlay" role="dialog" aria-modal="true" aria-labelledby="preview-title">
       <section className="practice-preview">
         <p className="eyebrow">{sceneTitle}・{exerciseNumber} / {exerciseCount}文</p>
-        <h2 id="preview-title">{isFirstExercise ? "最初の文章" : "次の文章"}を確認しましょう</h2>
+        <h2 id="preview-title">{isFirstExercise ? "最初の文章" : "次の文章"}</h2>
         <div className="preview-paper">
           <span>{exercise.context}</span>
           <blockquote>{exercise.description}</blockquote>
         </div>
         <div className="preview-actions">
-          <div className={`preview-wait ${canStart ? "ready" : "waiting"}`} id="preview-wait-status" role="status" aria-live="polite">
-            <span className="preview-clock" aria-hidden="true" />
-            <p>
-              <strong>{canStart ? "準備ができました" : `あと${remainingSeconds}秒`}</strong>
-              <small>{canStart ? "落ち着いたら入力を始められます" : "文章を読みながらお待ちください"}</small>
-            </p>
-          </div>
-          <button className="primary-button" onClick={onStart} disabled={!canStart} aria-describedby="preview-wait-status">
-            {canStart ? `${isFirstExercise ? "確認したので始める" : "この文章を入力する"} →` : `あと${remainingSeconds}秒で始められます`}
+          <button className="primary-button" onClick={onStart}>
+            {isFirstExercise ? "入力を始める →" : "この文章を入力する →"}
           </button>
           <button className="text-button" onClick={onClose}>練習メニューへ戻る</button>
         </div>
@@ -922,6 +902,12 @@ export default function Home() {
                     </span>
                   ))}
                 </div>
+                {!isJavaScene(scene) && (
+                  <div className="japanese-reference" aria-label={`入力する日本語 ${exercise.description}`}>
+                    <span>日本語</span>
+                    <p>{exercise.description}</p>
+                  </div>
+                )}
               </div>
             </section>
           </div>
